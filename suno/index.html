@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Instrument Spark Prompt — AI Music Studio</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: #08080f; color: #e4e4e7; min-height: 100vh; line-height: 1.5; }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+  .glow-1 { position: fixed; top: -180px; left: 50%; transform: translateX(-50%); width: 720px; height: 480px; border-radius: 50%; background: rgba(245,158,11,0.12); filter: blur(140px); pointer-events: none; z-index: 0; }
+  .glow-2 { position: fixed; top: 280px; right: -180px; width: 420px; height: 420px; border-radius: 50%; background: rgba(6,182,212,0.1); filter: blur(130px); pointer-events: none; z-index: 0; }
+  .glow-3 { position: fixed; top: 720px; left: -180px; width: 420px; height: 420px; border-radius: 50%; background: rgba(244,63,94,0.1); filter: blur(130px); pointer-events: none; z-index: 0; }
+  .container { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 0 16px 40px; }
+  nav { position: fixed; inset: 0 0 auto 0; z-index: 40; border-bottom: 1px solid rgba(255,255,255,0.08); background: rgba(8,8,15,0.88); backdrop-filter: blur(16px); }
+  .nav-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 56px; padding: 0 16px; }
+  .logo { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 15px; letter-spacing: -0.02em; text-decoration: none; }
+  .logo-icon { width: 18px; height: 18px; color: #f59e0b; }
+  .logo-text { background: linear-gradient(90deg, #fbbf24, #fb7185, #22d3ee); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .nav-link { padding: 6px 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.04); color: #a1a1aa; font-size: 12px; font-weight: 600; text-decoration: none; transition: all 0.2s ease; }
+  .nav-link:hover { background: rgba(255,255,255,0.08); color: #fff; }
+  header { text-align: center; padding: 88px 0 32px; }
+  .badge { display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px; border-radius: 999px; border: 1px solid rgba(245,158,11,0.3); background: rgba(245,158,11,0.08); color: #fcd34d; font-size: 11px; font-weight: 600; }
+  h1 { margin-top: 20px; font-size: 40px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; }
+  h1 .gradient { background: linear-gradient(90deg, #fbbf24, #fb7185, #22d3ee); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  h1 .sub { display: block; margin-top: 8px; font-size: 20px; font-weight: 400; color: #a1a1aa; letter-spacing: -0.01em; }
+  .subtitle { max-width: 520px; margin: 12px auto 0; font-size: 15px; color: #71717a; line-height: 1.6; }
+  .guide { border: 1px solid rgba(6,182,212,0.18); border-radius: 16px; background: rgba(6,182,212,0.04); padding: 20px; margin-bottom: 24px; }
+  .guide-title { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #22d3ee; margin-bottom: 16px; }
+  .guide-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .guide-step { display: flex; gap: 10px; align-items: flex-start; }
+  .guide-num { flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: #fff; }
+  .guide-num.n1 { background: linear-gradient(135deg, #f59e0b, #f43f5e); }
+  .guide-num.n2 { background: linear-gradient(135deg, #f43f5e, #22d3ee); }
+  .guide-num.n3 { background: linear-gradient(135deg, #22d3ee, #10b981); }
+  .guide-step h3 { font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 2px; }
+  .guide-step p { font-size: 12px; color: #a1a1aa; line-height: 1.5; }
+  @media (max-width: 640px) { .guide-grid { grid-template-columns: 1fr; } }
+  .section { border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; background: rgba(255,255,255,0.03); padding: 20px; margin-bottom: 16px; }
+  .section-accent { border-color: rgba(245,158,11,0.25); background: linear-gradient(180deg, rgba(245,158,11,0.06), transparent); }
+  .section-title { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #fbbf24; margin-bottom: 16px; }
+  .section-title svg { width: 16px; height: 16px; }
+  .fam-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  .fam-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04); color: #a1a1aa; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; }
+  .fam-btn:hover { background: rgba(255,255,255,0.08); color: #fff; }
+  .fam-btn.active { border-color: rgba(245,158,11,0.5); background: linear-gradient(90deg, rgba(245,158,11,0.2), rgba(244,63,94,0.15)); color: #fff; box-shadow: 0 4px 20px rgba(245,158,11,0.15); }
+  .fam-btn svg { width: 15px; height: 15px; }
+  .sub-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+  .sub-btn { padding: 6px 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04); color: #a1a1aa; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; }
+  .sub-btn:hover { background: rgba(255,255,255,0.08); color: #fff; }
+  .sub-btn.active { border-color: rgba(245,158,11,0.5); background: rgba(245,158,11,0.12); color: #fde68a; font-weight: 600; }
+  .desc-row { display: flex; flex-wrap: wrap; gap: 6px; }
+  .desc-chip { padding: 5px 14px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04); color: #a1a1aa; font-size: 12px; cursor: pointer; transition: all 0.2s ease; }
+  .desc-chip:hover { background: rgba(255,255,255,0.08); color: #fff; }
+  .desc-chip.active { border-color: rgba(245,158,11,0.5); background: rgba(245,158,11,0.15); color: #fde68a; font-weight: 600; }
+  .current-bar { display: flex; align-items: center; justify-content: space-between; margin-top: 16px; padding: 14px 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.08); background: rgba(0,0,0,0.25); }
+  .current-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #52525b; }
+  .current-value { font-size: 14px; font-weight: 600; color: #fff; margin-top: 2px; }
+  .lock-btn { padding: 8px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.04); color: #71717a; cursor: pointer; transition: all 0.2s ease; }
+  .lock-btn:hover { background: rgba(255,255,255,0.08); color: #fff; }
+  .lock-btn.locked { border-color: rgba(245,158,11,0.5); background: rgba(245,158,11,0.15); color: #fcd34d; }
+  .lock-btn svg { width: 16px; height: 16px; }
+  .spark-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .spark-row .section-title { margin: 0; }
+  .spark-btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 10px; border: none; background: linear-gradient(90deg, #f59e0b, #f43f5e, #22d3ee); color: #fff; font-size: 13px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 20px rgba(245,158,11,0.25); transition: transform 0.15s ease, opacity 0.15s ease; }
+  .spark-btn:hover { transform: scale(1.03); opacity: 0.95; }
+  .spark-btn:active { transform: scale(0.98); }
+  .spark-btn svg { width: 15px; height: 15px; }
+  .support-section { border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; background: rgba(255,255,255,0.03); padding: 20px; margin-bottom: 12px; }
+  .support-section.locked { border-color: rgba(245,158,11,0.3); background: rgba(245,158,11,0.04); }
+  .support-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .support-label { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
+  .support-label.mood { color: #fb7185; }
+  .support-label.style { color: #22d3ee; }
+  .support-actions { display: flex; gap: 4px; }
+  .support-actions button { padding: 5px; border-radius: 5px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); color: #71717a; cursor: pointer; transition: all 0.2s ease; }
+  .support-actions button:hover { background: rgba(0,0,0,0.5); color: #fff; }
+  .support-actions button svg { width: 13px; height: 13px; }
+  .support-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .support-chip { padding: 5px 12px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04); color: #a1a1aa; font-size: 12px; cursor: pointer; transition: all 0.2s ease; }
+  .support-chip:hover { background: rgba(255,255,255,0.08); color: #fff; }
+  .support-chip.active.mood { border-color: rgba(251,113,133,0.5); background: rgba(251,113,133,0.12); color: #fecdd3; font-weight: 600; }
+  .support-chip.active.style { border-color: rgba(34,211,238,0.5); background: rgba(34,211,238,0.12); color: #cffafe; font-weight: 600; }
+  .prompt-box { border: 1px solid rgba(245,158,11,0.2); border-radius: 16px; background: linear-gradient(180deg, rgba(245,158,11,0.04), transparent); padding: 20px; margin-top: 16px; }
+  .prompt-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .prompt-title { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #fbbf24; }
+  .prompt-title svg { width: 15px; height: 15px; }
+  .char-count { font-size: 11px; color: #52525b; font-family: ui-monospace, SFMono-Regular, monospace; }
+  .prompt-textarea { width: 100%; min-height: 80px; padding: 14px 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); color: #e4e4e7; font-size: 13px; line-height: 1.6; resize: vertical; outline: none; font-family: ui-monospace, SFMono-Regular, monospace; transition: border-color 0.2s ease; }
+  .prompt-textarea:focus { border-color: rgba(245,158,11,0.4); }
+  .prompt-textarea::placeholder { color: #52525b; }
+  .prompt-actions { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+  .btn-primary { display: inline-flex; align-items: center; gap: 6px; padding: 10px 20px; border-radius: 10px; border: none; background: linear-gradient(90deg, #f59e0b, #f43f5e); color: #fff; font-size: 13px; font-weight: 700; cursor: pointer; transition: opacity 0.2s ease; }
+  .btn-primary:hover { opacity: 0.9; }
+  .btn-primary svg { width: 14px; height: 14px; }
+  .btn-secondary { display: inline-flex; align-items: center; gap: 6px; padding: 10px 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.04); color: #a1a1aa; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; }
+  .btn-secondary:hover { background: rgba(255,255,255,0.08); color: #fff; }
+  .btn-secondary.copied { border-color: #34d399; color: #34d399; }
+  .btn-secondary svg { width: 14px; height: 14px; }
+  .btn-enhance { display: inline-flex; align-items: center; gap: 6px; padding: 10px 18px; border-radius: 10px; border: none; background: linear-gradient(90deg, #f59e0b, #f43f5e, #a855f7, #22d3ee); background-size: 200% 200%; color: #fff; font-size: 13px; font-weight: 700; cursor: pointer; animation: gradientShift 3s ease infinite; box-shadow: 0 4px 20px rgba(245,158,11,0.25); transition: transform 0.15s ease, opacity 0.15s ease; position: relative; overflow: hidden; }
+  .btn-enhance::before { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent); transform: translateX(-100%); animation: shineSweep 2.5s ease-in-out infinite; }
+  .btn-enhance:hover { transform: scale(1.03); opacity: 0.95; }
+  .btn-enhance:active { transform: scale(0.98); }
+  .btn-enhance svg { width: 15px; height: 15px; position: relative; z-index: 1; }
+  .btn-enhance span { position: relative; z-index: 1; }
+  .btn-undo { display: inline-flex; align-items: center; gap: 6px; padding: 10px 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.04); color: #a1a1aa; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; }
+  .btn-undo:hover { background: rgba(255,255,255,0.08); color: #fff; }
+  .btn-undo:disabled { opacity: 0.3; cursor: not-allowed; }
+  .btn-undo svg { width: 14px; height: 14px; }
+  @keyframes gradientShift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+  @keyframes shineSweep { 0% { transform: translateX(-100%); } 60%, 100% { transform: translateX(200%); } }
+  .prompt-hint { margin-top: 12px; font-size: 12px; color: #52525b; line-height: 1.5; }
+  .prompt-hint span { color: #a1a1aa; }
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); padding: 10px 20px; border-radius: 10px; background: #18181b; border: 1px solid rgba(255,255,255,0.1); color: #fff; font-size: 13px; font-weight: 600; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; z-index: 100; box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
+  .toast.show { opacity: 1; }
+  footer { text-align: center; padding: 32px 0; }
+  footer p { font-size: 12px; color: #3f3f46; }
+  footer a { color: #52525b; text-decoration: none; }
+  footer a:hover { color: #a1a1aa; }
+  @media (max-width: 640px) { h1 { font-size: 28px; } h1 .sub { font-size: 16px; } .guide-grid { grid-template-columns: 1fr; } }
+
+  /* Pass status bar */
+  .pass-bar { display: none; position: fixed; top: 56px; left: 0; right: 0; z-index: 35; padding: 8px 16px; text-align: center; font-size: 12px; font-weight: 600; }
+  .pass-bar.active { display: block; }
+  .pass-bar.free { background: rgba(6,182,212,0.12); color: #22d3ee; border-bottom: 1px solid rgba(6,182,212,0.2); }
+  .pass-bar.paid { background: rgba(16,185,129,0.12); color: #34d399; border-bottom: 1px solid rgba(16,185,129,0.2); }
+  .pass-bar .uses-left { font-weight: 800; }
+
+  /* Access gate overlay */
+  .gate-overlay { display: none; position: fixed; inset: 0; z-index: 50; background: rgba(8,8,15,0.95); backdrop-filter: blur(8px); align-items: center; justify-content: center; }
+  .gate-overlay.active { display: flex; }
+  .gate-box { max-width: 520px; width: 90%; text-align: center; padding: 40px 32px; border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; background: rgba(255,255,255,0.03); }
+  .gate-box h2 { font-size: 24px; font-weight: 800; margin-bottom: 8px; }
+  .gate-box p { font-size: 14px; color: #a1a1aa; margin-bottom: 16px; }
+</style>
+</head>
+<body>
+<div class="glow-1"></div><div class="glow-2"></div><div class="glow-3"></div>
+<!-- Pass status bar -->
+<div class="pass-bar free" id="passBarFree"><span id="passBarFreeText">Free trial — <span class="uses-left" id="usesLeft">2</span> uses left</span></div>
+<div class="pass-bar paid" id="passBarPaid"><span id="passBarPaidText">Full access active</span></div>
+<nav><div class="nav-inner"><a href="#" class="logo"><svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg><span class="logo-text">Instrument Spark Prompt</span></a><div style="display:flex;gap:8px;align-items:center;"><a href="https://www.musictechtools.xyz" class="nav-link">← Music Tech Tools</a><button class="nav-link" id="pricingBtn" style="cursor:pointer;background:linear-gradient(90deg,rgba(245,158,11,0.2),rgba(244,63,94,0.15));border-color:rgba(245,158,11,0.4);color:#fcd34d;">Pricing</button></div></div></nav>
+<div class="container">
+<header>
+<div class="badge"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>18 instrument families · 2,650+ descriptors · 130 sub-types · Instrument-first</div>
+<h1><span class="gradient">Build your sound</span><span class="sub">Instrument-first prompts for AI music studios</span></h1>
+<p class="subtitle">Start with an instrument, shape its character, then layer mood and style. One click generates a studio-ready prompt.</p>
+</header>
+<div class="guide">
+<div class="guide-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>How it works</div>
+<div class="guide-grid">
+<div class="guide-step"><div class="guide-num n1">1</div><div><h3>Pick your instrument</h3><p>Choose a family, sub-type and descriptor. This drives everything.</p></div></div>
+<div class="guide-step"><div class="guide-num n2">2</div><div><h3>Shape the vibe</h3><p>Click chips for mood and style. Lock what you love, reroll the rest.</p></div></div>
+<div class="guide-step"><div class="guide-num n3">3</div><div><h3>Enhance & copy</h3><p>Edit freely, hit Enhance for detail, Undo if needed, then copy.</p></div></div>
+</div>
+</div>
+<div class="section section-accent">
+<div class="section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>Instrument (the heart of your prompt)</div>
+<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#52525b;margin-bottom:10px;">Family</div>
+<div class="fam-row" id="famRow"></div>
+<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#52525b;margin:16px 0 10px;">Type</div>
+<div class="sub-row" id="subRow"></div>
+<div style="display:flex;align-items:center;justify-content:space-between;margin:16px 0 10px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#52525b;">Character / Descriptor</div><button id="randDescBtn" style="display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:6px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);color:#a1a1aa;font-size:11px;font-weight:600;cursor:pointer;transition:all 0.2s ease;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="8" cy="8" r="1.5"/><circle cx="16" cy="8" r="1.5"/><circle cx="8" cy="16" r="1.5"/><circle cx="16" cy="16" r="1.5"/><circle cx="12" cy="12" r="1.5"/></svg>Randomize</button></div>
+<div class="desc-row" id="descRow"></div>
+<div class="current-bar"><div><div class="current-label">Current instrument</div><div class="current-value" id="currentInst">—</div></div><button class="lock-btn" id="lockInst" title="Lock instrument"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></button></div>
+</div>
+<div class="spark-row">
+<div class="section-title" style="margin:0;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="m16.2 7.8 2.9-2.9"/><path d="M18 12h4"/><path d="m16.2 16.2 2.9 2.9"/><path d="M12 18v4"/><path d="m4.9 19.1 2.9-2.9"/><path d="M2 12h4"/><path d="m4.9 4.9 2.9 2.9"/></svg>Supporting elements</div>
+<button class="spark-btn" id="sparkAll"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>Spark all</button>
+</div>
+<div class="support-section" id="moodSection">
+<div class="support-head"><div class="support-label mood"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>Mood</div><div class="support-actions"><button id="randMood" title="Randomize mood"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="8" cy="8" r="1.5"/><circle cx="16" cy="8" r="1.5"/><circle cx="8" cy="16" r="1.5"/><circle cx="16" cy="16" r="1.5"/><circle cx="12" cy="12" r="1.5"/></svg></button><button id="lockMood" title="Lock mood"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></button></div></div>
+<div class="support-chips" id="moodChips"></div>
+</div>
+<div class="support-section" id="styleSection">
+<div class="support-head"><div class="support-label style"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Style</div><div class="support-actions"><button id="randStyle" title="Randomize style"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="8" cy="8" r="1.5"/><circle cx="16" cy="8" r="1.5"/><circle cx="8" cy="16" r="1.5"/><circle cx="16" cy="16" r="1.5"/><circle cx="12" cy="12" r="1.5"/></svg></button><button id="lockStyle" title="Lock style"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></button></div></div>
+<div class="support-chips" id="styleChips"></div>
+</div>
+<div class="prompt-box">
+<div class="prompt-head"><div class="prompt-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72"/><path d="m14 7 3 3"/><path d="M5 6v4"/><path d="M19 14v4"/><path d="M10 2v2"/><path d="M7 8H3"/><path d="M21 16h-4"/><path d="M11 3H9"/></svg>Your prompt</div><div class="char-count" id="charCount">0 / 1000</div></div>
+<textarea class="prompt-textarea" id="promptText" rows="3" placeholder="Your generated prompt will appear here..."></textarea>
+<div class="prompt-actions">
+<button class="btn-primary" id="copyBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>Copy prompt</button>
+<button class="btn-enhance" id="enhanceBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg><span>Enhance</span></button>
+<button class="btn-undo" id="undoEnhanceBtn" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>Undo enhance</button>
+<button class="btn-secondary" id="copyInstOnlyBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>Copy instrument only</button>
+</div>
+<div id="enhanceMsg" style="margin-top:8px;font-size:12px;color:#34d399;font-weight:600;opacity:0;transition:opacity 0.3s ease;"></div>
+<p class="prompt-hint">Edit freely above — overwrite any word. Hit <span>Enhance</span> to add ~500 chars of detail. <span>Undo</span> steps back one enhance. Then paste into your AI studio.</p>
+</div>
+<footer><p>Instrument Spark Prompt — built for AI music creators. <a href="https://www.musictechtools.xyz">Music Tech Tools</a></p></footer>
+</div>
+<div class="toast" id="toast">Copied to clipboard</div>
+
+<!-- Access gate overlay -->
+<div class="gate-overlay" id="gateOverlay">
+  <div class="gate-box">
+    <h2>🎟️ Choose your pass</h2>
+    <p id="gateMessage">Unlock unlimited prompts, Enhance, and all instrument families.</p>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:20px 0;text-align:left;">
+      <div style="border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px;background:rgba(255,255,255,0.03);">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#a1a1aa;margin-bottom:8px;">5 Day Pass</div>
+        <div style="font-size:28px;font-weight:800;color:#fff;">£5</div>
+        <button class="buy-btn secondary" style="margin-top:12px;width:100%;padding:10px;border-radius:8px;border:none;background:rgba(255,255,255,0.08);color:#e4e4e7;font-size:13px;font-weight:700;cursor:pointer;" onclick="buy('pass5')">Get Pass</button>
+      </div>
+      <div style="border:1px solid rgba(245,158,11,0.4);border-radius:12px;padding:16px;background:linear-gradient(180deg,rgba(245,158,11,0.06),transparent);position:relative;">
+        <div style="position:absolute;top:-8px;left:50%;transform:translateX(-50%);padding:3px 10px;border-radius:999px;background:linear-gradient(90deg,#f59e0b,#f43f5e);color:#fff;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;">Popular</div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#a1a1aa;margin-bottom:8px;margin-top:4px;">30 Day Pass</div>
+        <div style="font-size:28px;font-weight:800;color:#fff;">£15</div>
+        <button class="buy-btn" style="margin-top:12px;width:100%;padding:10px;border-radius:8px;border:none;background:linear-gradient(90deg,#f59e0b,#f43f5e);color:#fff;font-size:13px;font-weight:700;cursor:pointer;" onclick="buy('pass30')">Get Pass</button>
+      </div>
+      <div style="border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px;background:rgba(255,255,255,0.03);">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#a1a1aa;margin-bottom:8px;">Lifetime</div>
+        <div style="font-size:28px;font-weight:800;color:#fff;">£30 <span style="text-decoration:line-through;color:#52525b;font-size:16px;font-weight:500;">£40</span></div>
+        <button class="buy-btn secondary" style="margin-top:12px;width:100%;padding:10px;border-radius:8px;border:none;background:rgba(255,255,255,0.08);color:#e4e4e7;font-size:13px;font-weight:700;cursor:pointer;" onclick="buy('lifetime')">Get Lifetime</button>
+      </div>
+    </div>
+    <div class="tester-box" style="margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.08);">
+      <p style="font-size:12px;color:#52525b;margin-bottom:8px;">Have a tester or promo code?</p>
+      <input type="text" class="tester-input" id="gateTesterInput" placeholder="ENTER CODE" maxlength="12" style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(0,0,0,0.3);color:#e4e4e7;font-size:13px;text-align:center;letter-spacing:0.1em;text-transform:uppercase;outline:none;">
+    </div>
+  </div>
+</div>
+
+<script>
+// ========================
+// TOOL CONFIG
+// ========================
+const TOOL_KEY = 'instrumentspark';
+const FREE_USES = 99999999;
+
+// ========================
+// ACCESS CONTROL
+// ========================
+function getAccess() {
+  const pass = JSON.parse(localStorage.getItem(TOOL_KEY + '_pass') || 'null');
+  if (pass) {
+    if (pass.plan === 'lifetime') return { type: 'paid', plan: 'lifetime', expires: null };
+    const activated = new Date(pass.activatedAt);
+    const days = pass.plan === 'pass5' ? 5 : pass.plan === 'pass30' ? 30 : 0;
+    const expires = new Date(activated.getTime() + days * 24 * 60 * 60 * 1000);
+    if (new Date() < expires) return { type: 'paid', plan: pass.plan, expires };
+    localStorage.removeItem(TOOL_KEY + '_pass');
+  }
+  const uses = parseInt(localStorage.getItem(TOOL_KEY + '_uses') || '0', 10);
+  const remaining = Math.max(0, FREE_USES - uses);
+  return { type: remaining > 0 ? 'free' : 'locked', uses, remaining };
+}
+
+function recordUse() {
+  const uses = parseInt(localStorage.getItem(TOOL_KEY + '_uses') || '0', 10);
+  localStorage.setItem(TOOL_KEY + '_uses', String(uses + 1));
+  updatePassBar();
+}
+
+function activatePass(plan) {
+  localStorage.setItem(TOOL_KEY + '_pass', JSON.stringify({ plan, activatedAt: new Date().toISOString() }));
+  updatePassBar();
+}
+
+function updatePassBar() {
+  const access = getAccess();
+  const freeBar = document.getElementById('passBarFree');
+  const paidBar = document.getElementById('passBarPaid');
+  const usesLeftEl = document.getElementById('usesLeft');
+  const paidText = document.getElementById('passBarPaidText');
+  freeBar.classList.remove('active');
+  paidBar.classList.remove('active');
+  if (access.type === 'paid') {
+    paidBar.classList.add('active');
+    if (access.plan === 'lifetime') paidText.textContent = 'Lifetime access active';
+    else {
+      const daysLeft = Math.ceil((access.expires - new Date()) / (1000 * 60 * 60 * 24));
+      paidText.textContent = access.plan.replace('pass', '') + '-Day pass — ' + daysLeft + ' days left';
+    }
+  } else if (access.type === 'free') {
+    freeBar.classList.add('active');
+    usesLeftEl.textContent = access.remaining;
+  }
+}
+
+function checkAccess() {
+  const access = getAccess();
+  if (access.type === 'locked') {
+    showGate('You have used all your free tries. Unlock full access to keep creating.');
+    return false;
+  }
+  if (access.type === 'free') recordUse();
+  return true;
+}
+
+function showGate(msg) {
+  document.getElementById('gateMessage').textContent = msg;
+  document.getElementById('gateOverlay').classList.add('active');
+}
+
+function hideGate() {
+  document.getElementById('gateOverlay').classList.remove('active');
+}
+
+// ========================
+// STRIPE CHECKOUT
+// ========================
+async function buy(plan) {
+  try {
+    const res = await fetch('https://musictechtools.xyz/api/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tool: TOOL_KEY, plan, origin: window.location.origin }),
+    });
+    const data = await res.json();
+    if (data.url) window.location.href = data.url;
+    else alert(data.error || 'Checkout failed');
+  } catch (e) { alert('Checkout error: ' + e.message); }
+}
+
+// ========================
+// PAYMENT RETURN HANDLING
+// ========================
+function handlePaymentReturn() {
+  const q = new URLSearchParams(location.search);
+  if (q.get('payment') === 'success') {
+    const plan = q.get('plan');
+    if (plan) { activatePass(plan); showToast('Payment successful! Full access activated.'); hideGate(); }
+    history.replaceState(null, '', location.pathname);
+  } else if (q.get('payment') === 'cancelled') {
+    showToast('Payment cancelled.');
+    history.replaceState(null, '', location.pathname);
+  }
+}
+
+// ========================
+// TESTER CODES
+// ========================
+const TESTER_CODES = {
+  'MTTTEST2026': 'pass30', 'SPARKFRIEND': 'pass30', 'CREATORPASS': 'lifetime',
+  'BETAACCESS': 'pass5', 'EARLYBIRD': 'pass30',
+};
+function hashCode(str) { let h = 0; for (let i = 0; i < str.length; i++) h = ((h << 5) - h) + str.charCodeAt(i), h |= 0; return Math.abs(h).toString(16); }
+function checkTesterCode(code) {
+  code = code.trim().toUpperCase();
+  if (TESTER_CODES[code]) return TESTER_CODES[code];
+  const hidden = { 'a3f7b2e': 'lifetime', 'c8d1e4f': 'pass30', 'b2e5a9c': 'pass5' };
+  return hidden[hashCode(code)] || null;
+}
+function applyTesterCode(inputEl) {
+  const code = inputEl.value.trim().toUpperCase();
+  if (!code) return;
+  const plan = checkTesterCode(code);
+  if (plan) {
+    activatePass(plan);
+    showToast('Code accepted! ' + (plan === 'lifetime' ? 'Lifetime' : plan.replace('pass', '') + '-Day') + ' pass activated.');
+    hideGate();
+    inputEl.value = '';
+  } else { showToast('Invalid code'); }
+}
+
+// ========================
+// TOOL DATA & STATE
+// ========================
+
+const NONE_LABEL = 'None';
+
+const DATA = {
+  vocals: {
+    label: 'Vocals', icon: 'mic',
+    subs: {
+      female: { label: 'Female Vocals', descs: ['Beautiful & ethereal','Powerful & belted','Breathy & intimate','Soulful & warm','Operatic & soaring','Raspy & gritty','Whispered & delicate','Falsetto & airy','Diva & commanding','Soft & lullaby-like','Jazz & smoky','Pop & bright','Alternative & raw','Choir-like & layered','Autotuned & modern','Vocoder & robotic','Country & sweet','R&B & silky','Rock & fierce','Gospel & thunderous','Indie & dreamy','Folk & earthy','Disco & sparkly','Torch & sultry','Child-like & innocent','Narrator & story-telling','Scream & intense','Yodel & alpine','Scat & jazzy','Gregorian & haunting'] },
+      male: { label: 'Male Vocals', descs: ['Deep & baritone','Smooth & crooning','Raspy & bluesy','Powerful & anthemic','Falsetto & delicate','Soulful & Motown','Rap & rhythmic','Spoken & narrative','Chant & tribal','Operatic & tenor','Punk & aggressive','Folk & earthy','Country & twangy','Gospel & passionate','Autotuned & trap','Distant & reverb-drenched','Gravel & whiskey','Soft & whispered','Shout & stadium','Ballad & tender','Funk & groovy','Metal & growl','Jazz & scat','Lounge & velvet','Indie & fragile','Broadway & theatrical','Choir & bass','Narrator & documentary','Yodel & mountain','Hum & meditative'] },
+      duet: { label: 'Duet / Group', descs: ['Male-Female harmony','Unison power','Call-and-response','Layered choir','Gospel choir','Children choir','Whispered duet','Rap-sung hybrid','Gang vocals','Doo-wop harmonies','Barbershop quartet','Tribal chant group','Round & canon','Question-answer','Echo & delay','Stereo panned pair','Soprano-alto blend','Tenor-bass blend','Full SATB','Spoken-sung duo','Rap hook trade-off','Country harmony','Jazz scat duo','Operatic duo','Choir pad & sustained','Staggered entrances','Hocket & interlocking','Overtone singing','Mouth music & beatbox','Sea shanty group'] },
+      vfx: { label: 'Vocal Effects', descs: ['Heavy autotune','Vocoder robot','Pitch-shifted up','Pitch-shifted down','Chopped & sampled','Distant cathedral reverb','Telephone filter','Distorted scream','Reverse vocal','Stutter edit','Granular texture','Formant-shifted alien','Megaphone lo-fi','Radio announcer','Underwater muffled','Ghostly reversed echo','Bit-crushed 8-bit','Tape slowed & warped','Harmonizer thick','Whisper doubled','Vocal fry & creak','Lip trill & flutter','Inhale & breath only','Glottal stop rhythmic','Tuvan throat singing','Overtone chant','Beatbox percussion','Mouth trumpet','Scream & pitch dive','Vocal scratch & DJ'] },
+      spoken: { label: 'Spoken Word', descs: ['Poetic & rhythmic','Storyteller & warm','News anchor & crisp','ASMR & close','Meditation guide & calm','Movie trailer & epic','Documentary & factual','Comedic & playful','Dramatic monologue','Philosophical & ponderous','Prayer & reverent','Rant & energetic','Confession & intimate','Instructional & clear','Hypnotic & slow','Shamanic & trance','Children story & gentle','Elder & wise','Robot voiceover & flat','Alien translator & strange'] },
+      scream: { label: 'Scream / Growl', descs: ['Metal fry scream','Death growl','Black metal shriek','Hardcore shout','Punk yell','Grindcore pig squeal','False chord roar','Inhale scream','Whisper scream','Guttural brutal','High pitched wail','Raspy battle cry','Choked & strained','Clean-to-scream switch','Gang shout','Stadium chant','Tribal war cry','Horror movie scream','Comedic exaggerated','Breathy shriek'] },
+      beatbox: { label: 'Beatbox', descs: ['Classic kick & snare','Hi-hat rolls','Bass drop imitation','Scratch & turntable','Trumpet imitation','Laser & synth','Dubstep wobble','Techno four-on-floor','Jazz brush snare','Orchestral percussion','Industrial clang','Water drop','Throat bass sub','Inward snare','Outward k-snare','Click & rimshot','Tongue roll trill','Lip oscillation','Nasal buzz','Vocal scratch'] }
+    }
+  },
+  guitars: {
+    label: 'Guitars', icon: 'guitar',
+    subs: {
+      acoustic: { label: 'Acoustic Guitar', descs: ['Fingerpicked & intimate','Strummed & rhythmic','Nylon-string classical','Steel-string bright','12-string shimmering','Slide & bluesy','Percussive body hits','Open-tuning drone','Muffled & warm','Bright & jangly','Flamenco & fiery','Celtic & drone','Travis picking & rolling','Bossa nova gentle','Delta blues raw','Appalachian old-time','Percussive slap & tap','Harmonics & bell-like','Capo high & chimey','Drop-D heavy','DADGAD mystical','Open-G rolling','Carter family style','Ragtime syncopated','Gypsy jazz manouche','Singer-songwriter intimate','Campfire singalong','Orchestral arpeggio','Tremolo & shivering','Muted palm & thumpy'] },
+      electric: { label: 'Electric Guitar', descs: ['Clean & jazzy','Crunch & gritty','Heavy distortion','Fuzz & saturated','Wah-wah funky','Delay-soaked ambient','Reverb-drenched surf','Twangy country','Shoegaze wall-of-sound','Staccato funk','Power chord anthem','Tapping & virtuosic','Feedback drone','Chime & arpeggiated','Muted palm-chug','Sustained lead solo','Pinch harmonic squeal','Dive bomb whammy','Chicken pickin hybrid','Slide electric crying','Octave fuzz thick','Ring modulator weird','Phaser swirling','Flanger jet-plane','Chorus wide & shimmery','Tremolo pulsing','Reverse playback','Bit-crushed digital','Volume swell orchestral','E-bow infinite sustain'] },
+      bass: { label: 'Bass Guitar', descs: ['Funky slap & pop','Deep fingered groove','Picked & punky','Synth sub-bass','Upright jazz','Fretless & singing','Distorted & gritty','808-style sub','Acoustic stand-up','5-string extended','Guitar-bass hybrid','Octave-fuzz','Walking jazz line','Root note anchor','Pedal tone drone','Harmonic thump','Tapping melodic','Chording & rich','Muted ghost notes','Glissando slide','Staccato punchy','Legato smooth','Double stop blues','Chordal soloing','Piccolo bright & thin','Acoustic body thump','Bow & orchestral','Fuzzed-out doom','Filter envelope auto-wah','Ring modulator clang'] },
+      spec: { label: 'Specialty Guitar', descs: ['Pedal steel & country','Resonator & blues','Harp guitar','Baritone guitar','Cigar box & raw','Lap steel & Hawaiian','Dobro & bluegrass','Sitar emulation','7-string extended low','8-string djent','Nashville tuning high','Nylon crossover','Parlor small-body','Jumbo booming','Travel guitar thin','Silent guitar digital','3-string cigar box','4-string tenor','12-string electric jangle','Double-neck switching','Guitar synth MIDI','Acoustic-electric blend','Carbon fiber bright','Vintage relic aged','Headless modern','Fan-fret multi-scale','Fanned fret balanced','Touch guitar tapping'] },
+      classical: { label: 'Classical Guitar', descs: ['Sor & romantic','Tarrega & Spanish','Bach & baroque','Villa-Lobos & Brazilian','Paco de Lucia flamenco','Albeniz & impressionist','Dowland & renaissance','Brouwer & modern','Segovia & traditional','Williams & polished','Yamashita & virtuosic','Parkening & American','Romero & Spanish school','Barrios & Paraguayan','Lauro & Venezuelan','Giuliani & Italian','Carcassi & studies','Sagreras & progressive','Tarrega tremolo','Rasgueado flamenco','Picado fast scales','Arpeggio rolling','Alzapua thumb technique','Golpe percussion'] },
+      fingerstyle: { label: 'Fingerstyle', descs: ['Travis picking','Chet Atkins thumb','Tommy Emmanuel percussive','Michael Hedges tapping','Leo Kottke 12-string','Pierre Bensusan DADGAD','Andy McKee slap','Don Ross complex','Sungha Jung pop','Antoine Dufour harmonics','Erik Mongrain lap-tap','Kaki King prepared','Muriel Anderson harp-guitar','Preston Reed two-hand','Justin King flamenco-funk','Jon Gomm hyper-percussive','Trevor Gordon Hall kalimbatar','Mike Dawes modern','Luca Stricagnoli multi-neck','Marcin Patrzalek flamenco-shred'] }
+    }
+  },
+  keys: {
+    label: 'Keys & Synths', icon: 'piano',
+    subs: {
+      piano: { label: 'Piano', descs: ['Grand concert','Upright intimate','Honky-tonk saloon','Prepared & experimental','Rhodes electric','Wurlitzer warm','Toy piano & quirky','Muffled felt','Bright & percussive','Soft & ballad','Staccato rhythmic','Sustained pad-like','Bosendorfer imperial','Steinway concert','Bright Japanese','Kawai mellow','Chopin & romantic','Liszt & virtuosic','Debussy & impressionist','Rachmaninoff & lush','Gershwin & jazzy','Glass & minimal','Satie & melancholic','Bartok & percussive','Ligeti & cluster','Cage & prepared','Nancarrow & player-piano','Scriabin & mystical','Ravel & orchestral','Prokofiev & angular'] },
+      synth: { label: 'Synthesizer', descs: ['Warm analog pad','Bright supersaw lead','Arpeggiated sequence','FM bell-like','Modular drone','Bass pluck','Ambient texture','Retro 80s brass','Wavetable morphing','Granular cloud','Sub-bass rumble','Staccato stab','PWM pulse','Noise sweep','Chiptune 8-bit','Formant vocal','Minimoog lead','Juno pad lush','Prophet detuned','Oberheim massive','DX7 electric piano','SH-101 acid bass','TB-303 squelch','CS-80 cinematic','Jupiter brassy','MS-20 screaming','ARP Odyssey aggressive','Vocoder carrier','Karplus-Strong pluck','Physical modeling bowed'] },
+      organ: { label: 'Organ', descs: ['Hammond B3 gospel','Hammond jazz','Pipe cathedral','Farfisa garage','Clavinet funky','Rotary speaker swirl','Drawbar gospel','Drone pedal','Vox continental British','Combo compact portable','Theatre organ Wurlitzer','Positive organ small','Regal reedy','Portative medieval','Harmonium Indian','Shruti box drone','Calliope steam','Barrel organ street','Hand-cranked hurdy','Electronic home','Jazz trio comping','Rock power chord','Blues walking bass','Soul ballad sustained','Gospel shout chord','Progressive rock solo','Funk stabs','Reggae skank'] },
+      other: { label: 'Other Keys', descs: ['Harpsichord baroque','Celesta magical','Accordion folk','Bandoneon tango','Glass harmonica','Music box','Dulcimer Appalachian','Hammered dulcimer','Mellotron tape choir','Mellotron flute','Mellotron strings','Mellotron brass','Clavichord expressive','Virginal delicate','Spinet bright','Positive small','Digital stage piano','Suitcase Rhodes','Stage Wurlitzer','Electric grand','Hohner Pianet','Hohner Clavinet D6','ARP Solina string ensemble','Crumar stringman','CP electric','Fender Rhodes suitcase','Wurlitzer 200A','Hohner Electra-Piano','RMI Electra-piano','Baldwin Fun Machine'] },
+      digital: { label: 'Digital Piano', descs: ['Clavinova digital','Roland stage','Kawai concert','Nord stage','Korg SV-1 vintage','Casio Privia light','Kurzweil orchestral','Roland RD','P-series portable','Korg D1','Studiologic weighted','Arturia KeyLab','Native Instruments Komplete','Akai MPK hybrid','M-Audio Oxygen','Novation Launchkey','Roland FA workstation','Montage workstation','Korg Kronos','Kurzweil PC','Roland Fantom','Nord Electro','Korg SV-2','Dexibell Vivo','Casio Celviano','Arius console','Roland HP','Kawai CA'] },
+      stage: { label: 'Stage Piano', descs: ['CP88 stage','Roland RD-2000','Korg SV-2S','Nord Stage 4','Kawai MP','Studiologic Numa','Dexibell S','Roland FP','Casio PX-S','P-525 portable','Korg D1','Roland GO','Arturia KeyStep','Novation SL','Akai Advance','Native S88','M-Audio Hammer','Alesis Recital','Casio CDP','DGX arranger','Roland LX','Kawai ES','Korg LP','Casio AP','YDP console','Roland RP','Kawai KDP','Casio PX'] }
+    }
+  },
+  strings: {
+    label: 'Strings', icon: 'music',
+    subs: {
+      orch: { label: 'Orchestral Strings', descs: ['Violin solo emotive','Viola warm','Cello deep','Double bass foundation','String section lush','Pizzicato plucked','Tremolo tense','Legato flowing','Staccato rhythmic','Harmonics glassy','Con sordino muted','Sul ponticello eerie','Col legno wood strike','Ricochet bouncing','Spiccato bouncing bow','Sautille rapid','Martele hammered','Detache separated','Portato carried','Sul tasto flautando','Sul ponticello scratchy','Tremolo measured','Trill shimmering','Glissando sliding','Con sordino wah-wah','Ponticello harmonics','Bartok pizzicato snap','Snap pizzicato sharp'] },
+      world: { label: 'World Strings', descs: ['Erhu Chinese','Koto Japanese','Sitar Indian','Shamisen Japanese','Oud Middle Eastern','Bouzouki Greek','Charango Andean','Nyckelharpa Swedish','Hardanger fiddle','Morin khuur Mongolian','Tanpura drone','Sarangi Indian','Kamancheh Persian','Gusle Balkan','Kobyz Kazakh','Dombra Kazakh','Komuz Kyrgyz','Topshur Tuvan','Igil Tuvan','Byzaanchy Tuvan','Haegeum Korean','Ajaeng Korean','Gayageum Korean','Geomungo Korean','Pipa Chinese','Guzheng Chinese','Ruan Chinese','Liuqin Chinese','Yueqin Chinese','Zhongruan Chinese'] },
+      harp: { label: 'Harp & Plucked', descs: ['Concert harp glissando','Celtic harp','Electric harp','Lyre ancient','Zither dreamy','Autoharp','Psaltery','Kora African','Bandura Ukrainian','Kokle Latvian','Kannel Estonian','Kantele Finnish','Gusli Russian','Lap harp small','Lever harp folk','Pedal harp orchestral','Wire-strung brassy','Nylon-strung mellow','Cross-strung chromatic','Double-strung parallel','Therapy harp gentle','Folk harp bright','Gothic harp dark','Baroque harp historical','Single-action pedal','Double-action pedal','Irish harp wire','Scottish harp gut'] },
+      plucked: { label: 'Plucked Folk', descs: ['Mandolin tremolo','Banjo clawhammer','Banjo bluegrass','Ukulele strummed','Ukulele fingerpicked','Dobro resonator','Balalaika Russian','Domra Russian','Lute renaissance','Theorbo bass-lute','Archlute extended','Mandola alto','Mandocello tenor','Octave mandolin','Bouzouki Irish','Cittern wire','Tamburitza Balkan','Saz Turkish','Baglama Turkish','Tar Persian','Setar Persian','Dotar Afghan','Rubab Afghan','Sarod Indian','Veena Indian','Vichitra veena','Rudra veena','Saraswati veena'] },
+      bowed: { label: 'Bowed Folk', descs: ['Fiddle Irish','Fiddle Scottish','Fiddle Cape Breton','Fiddle Appalachian','Fiddle Old-time','Fiddle Bluegrass','Fiddle Cajun','Fiddle Metis','Fiddle Scandinavian','Fiddle Shetland','Fiddle Orcadian','Fiddle Galician','Hardanger fiddle Norway','Nyckelharpa Sweden','Morin khuur Mongolia','Igil Tuva','Byzaanchy Tuva','Topshur Tuva','Kobyz Kazakhstan','Dombra bowed','Gadulka Bulgaria','Gusle Serbia','Lijerica Croatia','Bisernica tamburica','Haegeum Korea','Ehru China','Jinghu Beijing','Gaohu Cantonese','Zhonghu alto','Gehu bass'] }
+    }
+  },
+  brass: {
+    label: 'Brass & Wind', icon: 'wind',
+    subs: {
+      brass: { label: 'Brass', descs: ['Trumpet bright','Trumpet muted','Trombone slide','French horn cinematic','Tuba deep','Brass section powerful','Brass stabs','Brass swells','Flugelhorn mellow','Cornet vintage','Sousaphon marching','Didgeridoo drone','Bugle military','Posthorn mail','Alphorn Swiss','Serpent historical','Ophicleide historical','Keyed bugle','Natural trumpet','Baroque trumpet','Piccolo trumpet','Bass trumpet','Contrabass trombone','Alto trombone','Soprano trombone','Cimbasso Italian','Wagner tuba','Euphonium British','Tenor horn','Mellophone marching'] },
+      sax: { label: 'Saxophone', descs: ['Alto smooth','Tenor smoky','Baritone deep','Soprano bright','Raspy rock','Breathy ballad','Staccato funk','Sustained cry','Sopranino tiny','Bass sax massive','C melody vintage','Contrabass subsonic','Subtone whisper','Growl dirty','Overtones multiphonic','Altissimo screaming','Slap tongue percussive','Flutter tongue rolling','Double tonguing fast','Circular breathing endless','Smear pitch bend','Scoop up','Fall off','Doit punch','Ghost note airy','Subtone dark','Bright pop','Mellow jazz','Edgy rock','Classical clean'] },
+      wood: { label: 'Woodwinds', descs: ['Flute airy','Piccolo bright','Clarinet smooth','Bassoon reedy','Oboe nasal','English horn','Pan flute mystical','Recorder medieval','Bansuri Indian','Dizi Chinese','Shakuhachi Japanese','Bagpipes drone','Alto flute warm','Bass flute deep','Contrabass flute sub','Irish flute wooden','Boehm system modern','Simple system traditional','Baroque flute wooden','Renaissance flute','Concert flute silver','Piccolo marching','Alto recorder','Tenor recorder','Bass recorder','Garklein tiny','Sopranino recorder','Great bass recorder','Contrabass recorder','Paixiao Chinese panpipe'] },
+      free: { label: 'Free Reed', descs: ['Harmonica blues','Harmonica chromatic','Harmonica tremolo','Concertina English','Bandoneon tango','Accordion piano','Accordion button','Melodica breathy','Pump organ parlor','Reed organ church','Harmonium Indian','Shruti box drone','Mouth organ blues','Blues harp cross','Chromonica jazz','Marine band folk','Hohner special','Lee Oskar modern','Suzuki manifold','Seydel steel','Diatonic major','Diatonic minor','Diatonic country','Paddy Richter tuning','PowerBender tuning','Wilde tuning','Melody Maker tuning','Natural minor tuning','Harmonic minor tuning','Country tuning'] },
+      ethnic_wind: { label: 'Ethnic Wind', descs: ['Duduk Armenian','Zurna Turkish','Ney Turkish','Kaval Balkan','Fujara Slovak','Koncovka Slovak','Ocarina clay','Xun Chinese clay','Hulusi Chinese gourd','Bawu Chinese','Sheng Chinese mouth','Lusheng Hmong','Khaen Thai','Mangtong Chinese','Tin whistle Irish','Low whistle Irish','Uilleann pipes Irish','Great Highland pipes Scottish','Border pipes Scottish','Northumbrian smallpipes','Pastoral pipes','Warpipes','Deger pipes electronic','Gaita Galician','Zampogna Italian','Tulum Turkish','Tulum Pontic','Gaida Balkan'] }
+    }
+  },
+  percussion: {
+    label: 'Percussion', icon: 'drum',
+    subs: {
+      drums: { label: 'Drums', descs: ['Live kit rock','Live kit jazz','Tight funk','Loose garage','808 trap','909 techno','707 electro','Breakbeat chopped','Taiko thunder','Marching snare','Brush swish','Rimshot click','Acoustic jazz brush','Big band swing','Latin timbale','Reggae one-drop','Ska upbeat','Punk fast','Grunge sludgy','Metal blast','Prog odd-time','Fusion complex','World hybrid','Orchestral timpani','Field drum rope','Rope tension historical','Side drum marching','Tenor drum','Multi-tenor quads','Bass drum orchestral'] },
+      hand: { label: 'Hand Percussion', descs: ['Congas Latin','Bongos bright','Djembe African','Tabla Indian','Cajon flamenco','Frame drum','Tambourine jingle','Shaker subtle','Cowbell sharp','Wood block','Claves','Rainstick','Bodhran Irish','Doumbek Middle Eastern','Darbuka Turkish','Ashiko African','Bata Cuban','Gbedu Nigerian','Sakara Nigerian','Gangan talking','Udu clay pot','Shekere gourd','Axatse Ewe','Kagan Ewe','Kidi Ewe','Sogo Ewe','Kloboto Ewe','Totodzi Ewe'] },
+      cymbals: { label: 'Cymbals & Gongs', descs: ['Crash explosive','Ride shimmering','China trashy','Splash quick','Gong massive','Bell tree','Finger cymbals','Crotale tuned','Hi-hat chick','Hi-hat open sizzle','Hi-hat foot splash','Crash-ride hybrid','Swish knocker','Pang exotic','Stack trashy','Ice bell','Orchestral crash','Orchestral suspended','Tam-tam dark','Wind gong','Opera gong','Nipple gong','Bowl gong','Temple block','Wood block orchestral','Claves orchestral','Triangle shimmering','Anvil metallic'] },
+      elec: { label: 'Electronic Perc', descs: ['Glitch stutter','Industrial clang','Trap hi-hat rolls','Snare rolls','Riser build','Impact hit','Reverse cymbal','Noise sweep','Side-stick click','Rimshot electronic','Clap layered','Snap finger','808 kick sub','909 kick punch','707 kick dry','606 kick thin','Linn kick tight','MPC kick sampled','Trap snare tight','Trap snare loose','Clap 808','Rim 808','Maracas 808','Conga 808','Tom 808','Cowbell 808','Clave 808','Hi-hat 808'] },
+      mallet: { label: 'Mallet Percussion', descs: ['Marimba warm','Marimba bright','Xylophone bright','Vibraphone motor','Glockenspiel bell','Celesta magical','Tubular bells orchestral','Chimes church','Steel pan Trinidad','Steel pan tenor','Steel pan double','Steel pan quad','Handpan hang','Handpan rav','Handpan ayasa','Handpan meraki','Crotales tuned','Aluphone metallic','Bell lyre marching','Orchestra bells','Mark tree wind','Sleigh bells jingle','Tambourine frame','Tambourine headless'] },
+      timpani: { label: 'Timpani & Orchestral', descs: ['Timpani roll crescendo','Timpani hit accent','Timpani glissando','Timpani pedal drone','Bass drum orchestral','Snare drum orchestral','Tenor drum roll','Triangle roll','Wood block temple','Temple block five','Ratchet gear','Siren hand','Whistle slide','Whistle police','Whistle boat','Whistle train','Sleigh bells','Castanets Spanish','Whip crack','Sandpaper block','Lion roar','Bird whistle','Cuckoo clock','Thunder sheet'] }
+    }
+  },
+  world: {
+    label: 'World & Ethnic', icon: 'globe',
+    subs: {
+      african: { label: 'African', descs: ['Djembe ensemble','Talking drum','Kalimba thumb piano','Balafon','Shekere shaker','Agogo bells','Udu clay pot','Bata drums','Kora 21-string','Ngoni hunter','Xalam Senegalese','Bolon bass harp','Sabar Senegalese','Tama talking','Dundun Yoruba','Gangan talking','Ome master','Iya mother','Itotele middle','Okonkolo small','Ewe drumming','Adowa Ashanti','Kpanlogo Ga','Borborbor Ewe','Agbadza Ewe','Atsiagbekor Ewe','Gahu Ewe','Sewewu Ewe'] },
+      asian: { label: 'Asian', descs: ['Guzheng Chinese','Gamelan Indonesian','Shamisen Japanese','Koto Japanese','Erhu Chinese','Pipa Chinese','Hichiriki Japanese','Suona Chinese','Sheng Chinese','Dizi Chinese','Xiao Chinese','Hulusi Chinese','Bawu Chinese','Morin khuur Mongolian','Yatga Mongolian','Yoochin Mongolian','Khoomei throat','Dan bau Vietnamese','Dan tranh Vietnamese','Dan nguyet Vietnamese','Khene Lao','Pin Thai','Sombat Thai','Ranat Thai','Angklung Indonesian','Kendang Balinese','Rebab Javanese','Suling Javanese'] },
+      latin: { label: 'Latin', descs: ['Charango','Bandoneon','Cuatro','Tres','Pan flute Andean','Bombo drum','Quena','Zampoña','Guitarron bass','Vihuela Mexican','Jarana Veracruz','Requinto guitar','Bajo sexto','Bajo quinto','Conjunto button','Norteño accordion','Cavaquinho Brazilian','Bandolim Brazilian','Pandeiro Brazilian','Surdo bass','Repinique lead','Caixa snare','Agogo bells','Berimbau bow','Atabaque hand','Timbal Cuban','Conga Cuban','Bongo Cuban'] },
+      celtic: { label: 'Celtic & Nordic', descs: ['Uilleann pipes','Tin whistle','Bodhran drum','Fiddle Irish','Hurdy-gurdy','Nyckelharpa','Kantele Finnish','Willow flute','Great Highland pipes','Border pipes','Northumbrian pipes','Scottish smallpipes','Welsh pibgorn','Welsh crwth','Breton bombarde','Breton biniou','Galician gaita','Asturian gaita','Swedish sackpipa','Estonian torupill','Latvian dudas','Lithuanian lumzdelis','Norwegian seljefloyte','Shepherd flute','Tagelharpa','Strakharpa','Moraharpa','Kontrabasharpa'] },
+      middle_east: { label: 'Middle Eastern', descs: ['Oud Arabic','Saz Turkish','Baglama Turkish','Tar Persian','Setar Persian','Santur Persian','Kamancheh Persian','Ney Persian','Daf frame','Darbuka goblet','Riq tambourine','Mazhar bass','Qanun zither','Kanun Turkish','Kanun Arabic','Simsimiyya Egyptian','Rabab Moroccan','Gnawa bass','Krakebs metal','Bendir frame','Zurna loud','Mizmar Egyptian','Arghul double','Mijwiz double'] },
+      indian: { label: 'Indian', descs: ['Sitar','Sarangi','Santoor','Tabla','Bansuri','Shehnai','Pakhawaj','Mridangam','Ghatam clay','Kanjira frame','Morsing jaw','Tavil loud','Veena Saraswati','Veena Rudra','Veena Vichitra','Veena Gottuvadhyam','Tambura drone','Ektara one','Dotar two','Tuntuna rhythmic','Sarangi folk','Sarod','Esraj','Tar shehnai'] },
+      polynesian: { label: 'Polynesian & Pacific', descs: ['Ukulele Hawaiian','Slack-key guitar','Kihoalu Hawaiian','Steel guitar lap','Pedal steel country','Dobro resonator','Ipu gourd drum','Pahu drum','Puniu coconut','Ili ili stones','Puili bamboo','Uliuli feather','Pahu heiau sacred','Kaekeeke bamboo','Hokioi bullroarer','Putorino Maori','Koauau Maori','Nguru Maori','Purerehua Maori','Tokere Maori','Pate Maori','Pahu Maori','Conch shell','Didgeridoo Australian'] },
+      slavic: { label: 'Slavic & Eastern European', descs: ['Balalaika Russian','Domra Russian','Gusli Russian','Kokle Latvian','Kannel Estonian','Kankles Lithuanian','Cimbalom Hungarian','Hammered dulcimer','Bandura Ukrainian','Kobza Ukrainian','Torban Ukrainian','Lira Ukrainian','Fujara Slovak','Koncovka Slovak','Gaida Bulgarian','Kaval Balkan','Gadulka Bulgarian','Gadulka Thracian','Tambura Bulgarian','Tupan drum','Cimbalom Romani','Tarogato Hungarian','Duda bagpipe','Dudelsack German'] }
+    }
+  },
+  electronic: {
+    label: 'Electronic', icon: 'cpu',
+    subs: {
+      textures: { label: 'Synth Textures', descs: ['Warm pad','Cold digital pad','Bowing string emulation','Vocal choir pad','Bass drone','High shimmer','Rhythmic pulse','Random generative','Super saw stack','Detuned unison','Pulse width sweep','Frequency modulation bell','Additive spectral','Subtractive analog','Physical modeling pluck','Sample-based realistic','Granular cloud','Spectral freeze','Resonant filter sweep','Self-oscillating resonance','Noise-based texture','Feedback drone','Karplus-Strong metallic','Waveguide physical','Vector morphing','Wavetable scan','Phase distortion','Ring modulation clang'] },
+      samplers: { label: 'Samplers', descs: ['Vinyl chop','Field recording','Granular cloud','Time-stretch glitch','Stutter edit','Reverse texture','Micro-sample','Found sound','Akai MPC punch','E-mu Emulator vintage','Fairlight CMI digital','Ensoniq EPS','Korg MS2000','Roland S-760','A3000 sampler','Kurzweil K2000','Sample drum kit','Sample orchestral hit','Sample vocal stab','Sample bass drop','Chopped breakbeat','Chopped soul','Chopped jazz','Chopped classical','One-shot stab','One-shot impact','One-shot riser','One-shot sweep'] },
+      modular: { label: 'Modular & FX', descs: ['Bleep sequence','Drone evolution','Noise burst','Clock tick','Self-oscillating filter','Sample & hold','Ring modulation','Wavefolder','Eurorack patch','Buchla bongo','Serge complex','Moog modular','Doepfer A-100','Make Noise shared','Intellijel clean','Mutable Instruments','Random voltage','Slew limiter glide','Comparator gate','Logic module XOR','Shift register','Turing machine','Quantizer scale','Clock divider','Clock multiplier','Envelope follower','Pitch tracker','Gate extractor'] },
+      drum_machine: { label: 'Drum Machine', descs: ['Roland TR-808','Roland TR-909','Roland TR-707','Roland TR-606','Roland TR-505','Roland TR-626','Roland TR-808 clone','Roland TR-909 clone','LinnDrum LM-1','LinnDrum LM-2','Oberheim DMX','E-mu Drumulator','RX-5 drum','RY-30 drum','Korg DDD-1','Korg KR-55','Akai MPC-60','Akai MPC-3000','Akai MPC-2000','Akai MPC-1000','Elektron Machinedrum','Elektron Analog Rytm','Teenage Engineering PO-12','Arturia DrumBrute','Behringer RD-8','Behringer RD-9','Behringer CR-78','Sonic Potions LXR'] },
+      sequencer: { label: 'Sequencer', descs: ['Step sequence 16','Step sequence 32','Step sequence 64','Piano roll grid','Euclidean rhythm','Probability gate','Random skip','Ratchet repeat','Arpeggiator up','Arpeggiator down','Arpeggiator up-down','Arpeggiator random','Arpeggiator chord','Arpeggiator pattern','Bassline 303','Bassline 101','Melody generator','Chord progression AI','Generative ambient','Evolution morph','MIDI loop clip','MIDI clip launch','Scene trigger','Pattern chain','Song mode arrangement','Chain mode live','Follow action random','Follow action next'] },
+      dj: { label: 'DJ & Turntablism', descs: ['Vinyl scratch chirp','Vinyl scratch baby','Vinyl scratch flare','Vinyl scratch crab','Vinyl scratch transformer','Vinyl scratch orbit','Vinyl scratch twiddle','Vinyl scratch scribble','Vinyl backspin','Vinyl brake stop','Vinyl spinback','Vinyl powerdown','Crossfade cut','Crossfade echo','Crossfade filter','Crossfade beatmatch','Juggle beat','Juggle juggle','Juggle flare','Juggle crab','Drum sample trigger','Loop roll 1/8','Loop roll 1/16','Loop roll 1/32','Beat repeat stutter','Beat repeat reverse','Beat repeat pitch','Beat repeat gate'] },
+      looper: { label: 'Looper & Live', descs: ['Boss RC-505','Boss RC-300','Electro-Harmonix 720','TC Electronic Ditto','Ableton Live loop','Logic Pro loop','GarageBand loop','FL Studio slice','First loop foundation','Overdub layer','Undo last','Redo last','Half-speed slow','Double-speed fast','Reverse playback','One-shot trigger','Quantized sync','Freeform unsync','Fade out tail','Fade in entrance','Feedback build','Feedback decay','Feedback oscillation','Feedback destruction'] }
+    }
+  },
+  texture: {
+    label: 'Texture & Ambience', icon: 'cloud',
+    subs: {
+      nature: { label: 'Nature', descs: ['Rain gentle','Rain storm','Ocean waves','Wind howling','Fire crackle','Birdsong morning','Cicada summer','Water stream','Thunder distant','Thunder close','Snow crunch','Ice crack','Leaves rustle','Branch snap','Forest canopy','Jungle dense','Desert wind','Sand dune','Canyon echo','Mountain breeze','Waterfall cascade','River rapid','Lake lapping','Marsh frog','Wolf howl','Owl hoot','Crow caw','Seagull cry'] },
+      urban: { label: 'Urban', descs: ['City traffic','Subway rumble','Cafe chatter','Construction','Footsteps echo','Elevator hum','Neon buzz','Police siren distant','Car horn','Bus engine','Train whistle','Airplane overhead','Helicopter chop','Skateboard roll','Basketball bounce','Children playground','Market crowd','Street musician','Busker guitar','Subway performer','Door slam','Phone ring','Keyboard typing','Printer whir','Coffee machine','Refrigerator hum','Air conditioning','Heater vent'] },
+      abstract: { label: 'Abstract', descs: ['White noise','Pink noise','Brown noise','Sub-bass rumble','Glass harmonica','Metal scrape','Radio static','Tape hiss','Vinyl crackle','Cassette wow & flutter','Digital glitch','Bit reduction','Aliasing artifact','Dither noise','Quantization error','Clock jitter','Ground loop hum','RF interference','Cell phone buzz','Power supply whine','Reverb tail infinite','Delay feedback oscillation','Flanger through-zero','Phaser sweep','Chorus detune','Tremolo amplitude','Vibrato pitch','Ring modulator bell'] },
+      space: { label: 'Space & Sci-Fi', descs: ['Cosmic drone','Nebula wash','Starfield twinkle','Black hole pull','Wormhole tunnel','Solar flare burst','Aurora shimmer','Comet tail','Satellite beep','Radar ping','Sonar pulse','Laser zap','Phaser beam','Photon torpedo','Warp drive engage','Hyperjump jump','Alien communication','Robot servo motor','Cyborg heartbeat','AI voice synthetic','Hologram flicker','Force field hum','Teleporter dissolve','Time machine warp','Gravity well pull','Zero-G float','Airlock hiss','Engine room drone'] },
+      underwater: { label: 'Underwater', descs: ['Deep ocean pressure','Bubble stream','Bubble pop','Sonar ping','Whale song','Dolphin click','Seal bark','Penguin splash','Coral reef crackle','Current flow','Tidal surge','Iceberg melt','Submarine propeller','Diving bell clank','Scuba regulator','Hydrophone rumble','Kelp forest sway','Bioluminescence pulse','Deep sea vent','Marianas trench','Ship hull creak','Anchor chain rattle','Dock wood groan','Wave break underwater'] },
+      mechanical: { label: 'Mechanical', descs: ['Clock tick','Clock chime','Gear grind','Spring release','Piston pump','Steam whistle','Valve hiss','Belt squeak','Chain rattle','Lever clank','Switch click','Dial turn','Motor whir','Fan blade','Compressor pump','Hydraulic press','Welding spark','Hammer strike','Anvil ring','Saw blade','Drill bore','Lathe cut','Mill machine','3D printer layer'] },
+      organic: { label: 'Organic', descs: ['Heartbeat pulse','Breath inhale','Breath exhale','Snore rumble','Stomach gurgle','Joint crack','Skin rub','Hair brush','Toothbrush scrub','Mouth pop','Tongue click','Throat clear','Finger snap','Hand clap','Foot stomp','Knee slap','Paper tear','Paper crumple','Page flip','Book thud','Fabric rustle','Leather creak','Zipper pull','Button snap'] },
+      fire: { label: 'Fire & Energy', descs: ['Match strike','Lighter flick','Candle flame','Torch blaze','Campfire crackle','Bonfire roar','Hearth warm','Forge blast','Spark shower','Ember pop','Flame whoosh','Explosion boom','Firework whistle','Firework crack','Firework boom','Sparkler sizzle','Electrical arc','Tesla coil','Plasma buzz','Lightning crack','Plasma ball','Neon flicker','LED pulse','Laser hum'] }
+    }
+  },
+  ensemble: {
+    label: 'Ensemble & Choir', icon: 'users',
+    subs: {
+      string_ensemble: { label: 'String Ensemble', descs: ['Full orchestra strings','Chamber ensemble small','Tremolo strings','Pizzicato strings','Con sordino muted','Sul ponticello eerie','Spiccato bouncing','Legato flowing','Staccato rhythmic','Harmonics glassy','Marcato accented','Espressivo emotive','Dramatic swells','Soft pad sustain','Bright section','Dark cinematic','Baroque ensemble','Romantic lush','Modern minimalist','Film score epic'] },
+      synth_strings: { label: 'Synth Strings', descs: ['Warm analog pad','Bright digital pad','Slow attack pad','Fast attack stab','Detuned unison','PWM pulse sweep','Super saw stack','Vintage string machine','Solina ensemble','ARP string ensemble','Oberheim pad','Juno pad lush','Prophet pad','CS-80 cinematic','Pulsating rhythmic','Evolving morphing','Bright pop strings','Dark ambient strings','Shimmering high','Sub-bass drone'] },
+      choir: { label: 'Choir', descs: ['Mixed choir aahs','Mixed choir oohs','Boys choir pure','Girls choir bright','Mens choir deep','Womens choir ethereal','Gregorian chant','Gospel shout','Spiritual soul','Operatic choir','Whisper choir','Scream choir','Tuvan throat choir','Mongolian throat','Bulgarian voices','African call-and-response','Celtic Gaelic','Nordic rune','Tibetan chant','Om meditation'] },
+      synth_choir: { label: 'Synth Choir', descs: ['Vocal pad aah','Vocal pad ooh','Formant filter choir','Vocoder choir','Robot choir','Angelic shimmer','Demonic dark','Heavenly bright','Underwater muffled','Cathedral space','Small room intimate','Wide stereo spread','Mono focused','Layered octaves','Fifth harmony','Cluster dissonance','Spectral choir','Granular vocal cloud','Stretched time vocal','Reversed vocal pad'] },
+      orchestra_hit: { label: 'Orchestra Hit', descs: ['Full tutti hit','Brass hit','String hit','Percussion hit','Dramatic accent','Staccato stab','Sustained chord','Minor chord dark','Major chord bright','Diminished tense','Augmented mysterious','Cluster atonal','Timpani roll hit','Cymbal crash hit','Bass drum boom','Tamtam gong hit','Xylophone hit','Marimba hit','Metallic hit','Electronic hybrid hit'] },
+      brass_ensemble: { label: 'Brass Ensemble', descs: ['Full brass section','French horn section','Trumpet section','Trombone section','Tuba bass foundation','Brass choir','Brass fanfare','Brass chorale','Brass stabs','Brass swells','Muted brass warm','Open brass bright','Cinematic brass','Marching brass','Jazz brass','Baroque brass','Romantic brass','Modern brass','Synth brass hybrid','Dark brass ominous'] }
+    }
+  },
+  synth_voices: {
+    label: 'Synth Voices', icon: 'zap',
+    subs: {
+      synth_pad: { label: 'Synth Pad', descs: ['New age ethereal','Warm analog','Polysynth rich','Choir vocal','Bowed string','Metallic shimmer','Halo bell','Sweep filter','Dark ambient','Bright pop','Slow attack evolving','Fast attack percussive','PWM pulse','Sawtooth thick','Triangle soft','Square hollow','Noise texture','Resonant filter','Self-oscillating','Sub-bass drone'] },
+      synth_lead: { label: 'Synth Lead', descs: ['Square wave bright','Sawtooth aggressive','Triangle soft','Pulse wave hollow','Calliope circus','Chiff breathy','Charang distorted','Fifth interval','Bass and lead','Minimoog classic','Prophet detuned','Jupiter brassy','Oberheim massive','SH-101 acid','MS-20 screaming','ARP Odyssey aggressive','Modular bleep','Wavetable morphing','FM bell-like','Physical modeling pluck'] },
+      synth_fx: { label: 'Synth FX', descs: ['Rain texture','Soundtrack cinematic','Crystal bell','Atmosphere drone','Brightness shimmer','Goblins dark','Echoes space','Sci-fi laser','Warp speed','Teleporter dissolve','Force field hum','Hologram flicker','Robot servo','Cyborg heartbeat','AI voice synthetic','Alien communication','Space launch','Time machine','Gravity well','Black hole pull'] },
+      synth_bass: { label: 'Synth Bass', descs: ['Acid 303 squelch','Sub-bass rumble','Pulse width bass','Sawtooth bass','Square bass','FM bass','Wavetable bass','Physical modeling bass','Resonant filter bass','Self-oscillating bass','Analog warmth','Digital cold','Fuzz distortion','Overdrive grit','Octave fuzz','Ring mod clang','FM metallic','Granular texture','Sampled acoustic','Hybrid synth-acoustic'] }
+    }
+  },
+  sound_fx: {
+    label: 'Sound Effects', icon: 'activity',
+    subs: {
+      nature: { label: 'Nature FX', descs: ['Seashore waves','Bird tweet','Rain gentle','Rain storm','Thunder distant','Thunder close','Wind howling','Wind breeze','Water stream','Waterfall cascade','Fire crackle','Campfire','Snow crunch','Ice crack','Leaves rustle','Forest canopy','Jungle dense','Desert wind','Canyon echo','Mountain breeze'] },
+      mechanical: { label: 'Mechanical FX', descs: ['Helicopter blades','Train whistle','Airplane overhead','Car engine','Bus engine','Subway rumble','Elevator hum','Door slam','Phone ring','Keyboard typing','Printer whir','Coffee machine','Refrigerator hum','Air conditioning','Heater vent','Clock tick','Clock chime','Gear grind','Motor whir','Fan blade'] },
+      percussion_fx: { label: 'Percussion FX', descs: ['Tinkle bell','Agogo bells','Steel drums','Woodblock','Taiko drum thunder','Melodic tom','Synth drum','Reverse cymbal','Anvil strike','Whip crack','Ratchet gear','Siren hand','Whistle slide','Whistle police','Thunder sheet','Lion roar','Bird whistle','Cuckoo clock','Castanets Spanish','Sandpaper block'] },
+      guitar_fx: { label: 'Guitar FX', descs: ['Guitar fret noise','String scrape','Pick attack','Palm mute thump','Harmonic ping','Dive bomb','Feedback squeal','Volume swell','Wah-wah sweep','Tremolo bar flutter','String bend up','String bend down','Vibrato wide','Slide up','Slide down','Hammer-on','Pull-off','Tapping click','Artificial harmonic','Natural harmonic'] },
+      breath_fx: { label: 'Breath & Body FX', descs: ['Breath noise inhale','Breath noise exhale','Flute key click','Clarinet key click','Saxophone key click','Brass valve click','Brass lip buzz','Vocal fry','Throat clear','Finger snap','Hand clap','Foot stomp','Knee slap','Mouth pop','Tongue click','Lip trill','Inhale gasp','Exhale sigh','Whisper','Hiss'] },
+      cinematic_fx: { label: 'Cinematic FX', descs: ['Applause crowd','Gunshot','Explosion boom','Car crash','Glass shatter','Metal crash','Whoosh fast','Whoosh slow','Riser build','Downer fall','Impact hit','Sub drop','Stinger sharp','Braam ominous','Drone low','Drone high','Pulse rhythmic','Stutter glitch','Reverse texture','Granular cloud'] }
+    }
+  },
+  stage_guitars: {
+    label: 'Stage Guitars', icon: 'guitar',
+    subs: {
+      nylon: { label: 'Nylon Guitar', descs: ['Classical Spanish','Flamenco fiery','Bossa nova gentle','Latin fingerstyle','Romantic arpeggio','Baroque counterpoint','Renaissance lute-like','Soft and mellow','Bright and articulate','Warm and intimate','Concert hall','Small room','Miked close','Miked distant','Capo high','Open tuning','Tremolo Spanish','Rasgueado flamenco','Picado fast','Alzapua thumb'] },
+      steel: { label: 'Steel Guitar', descs: ['Fingerpicked folk','Strummed campfire','Flatpicked bluegrass','Travis picking','Carter family style','Appalachian old-time','Celtic drone','Delta blues raw','Country twang','Folk ballad','Singer-songwriter','Bright and jangly','Warm and woody','Muffled and soft','Percussive body hits','Harmonics bell-like','Open tuning drone','Drop D heavy','DADGAD mystical','Celtic cross'] },
+      jazz_guitar: { label: 'Jazz Guitar', descs: ['Clean archtop','Wes Montgomery octaves','George Benson smooth','Pat Metheny fusion','John Scofield funk','Kurt Rosenwinkel modern','Grant Green soul','Kenny Burrell blues','Jim Hall delicate','Joe Pass solo','Comping chords','Walking bass lines','Chord melody','Bossa nova comping','Bebop single note','Cool jazz clean','Hard bop gritty','Modal open','Free jazz atonal','Gypsy jazz manouche'] },
+      clean_electric: { label: 'Clean Electric', descs: ['Bright single coil','Warm humbucker','Chimey Rickenbacker','Twangy Telecaster','Smooth Stratocaster','Thick Les Paul','Hollow body warm','Semi-hollow resonant','Solid body punchy','Short scale mellow','Long scale bright','Maple neck snappy','Rosewood neck warm','Ebony neck articulate','Vintage low output','Modern high output','Active pickup clean','Passive pickup dynamic','Coil split single','Coil tap bright'] },
+      muted_guitar: { label: 'Muted Guitar', descs: ['Palm mute chug','Palm mute tight','Palm mute loose','String mute jazz','Velvet mute warm','Felt mute soft','Foam mute dead','Hand mute percussive','Bridge mute bright','Neck mute dark','Staccato funk','Ghost note rhythmic','Chunky rock','Thrash metal','Djent polyrhythm','Funk scratch','Reggae skank','Ska upstroke','Percussive slap','Rhythmic chop'] },
+      overdrive: { label: 'Overdrive Guitar', descs: ['Blues overdrive','Classic rock crunch','Hard rock gain','Punk distortion','Grunge fuzz','Stoner doom','Southern rock twang','Texas blues','British invasion','American garage','Tube screamer','Klon centaur','Blues breaker','Plexi crunch','JCM800 raw','Rectifier modern','5150 aggressive','Orange fuzz','Fender tweed breakup','Vox AC30 chime'] }
+    }
+  },
+  stage_bass: {
+    label: 'Stage Bass', icon: 'music',
+    subs: {
+      acoustic_bass: { label: 'Acoustic Bass', descs: ['Upright jazz','Upright classical','Upright bluegrass','Upright rockabilly','Upright psychobilly','Upright slap','Upright pizzicato','Upright arco bowed','Upright thumb','Upright fingered','Warm and woody','Bright and punchy','Muffled and soft','Resonant and open','Close miked','Room miked','Amplified','Unamplified natural','Vintage thump','Modern clarity'] },
+      finger_bass: { label: 'Finger Bass', descs: ['Deep fingered groove','Warm and round','Bright and articulate','Soft and mellow','Aggressive and punchy','Smooth and legato','Staccato and percussive','Ghost note rhythmic','Hammer-on melodic','Pull-off fast','Slide expressive','Glissando smooth','Vibrato wide','Harmonic bell-like','Double stop blues','Chordal rich','Pedal tone drone','Walking jazz line','Root note anchor','Octave jump'] },
+      picked_bass: { label: 'Picked Bass', descs: ['Punk fast','Metal tight','Rock driving','Pop bright','New wave choppy','Post-punk angular','Indie jangly','Garage raw','Psych rock fuzzy','Stoner slow','Plectrum attack sharp','Plectrum attack soft','Alternate picking','Down picking heavy','Up picking light','Gallop rhythm','Triplet feel','Dotted rhythm','Syncopated funk','Straight eighths'] },
+      fretless_bass: { label: 'Fretless Bass', descs: ['Jaco Pastorius bright','Jaco Pastorius melodic','Pino Palladino warm','Gary Willis technical','Michael Manring harmonic','Steve Bailey chordal','Mark Egan singing','Percy Jones aggressive','Stu Hamm slap','Tony Franklin smooth','Mwah expressive','Slide vocal-like','Vibrato wide','Harmonic natural','Artificial harmonic','Double stop','Chordal soloing','Tapping melodic','Glissando smooth','Sustain singing'] },
+      slap_bass: { label: 'Slap Bass', descs: ['Funky slap and pop','Larry Graham pioneer','Bootsy Collins space','Louis Johnson tight','Marcus Miller bright','Victor Wooten technical','Stanley Clarke fusion','Flea aggressive','Geddy Lee driving','Les Claypool weird','Thumb slap deep','Thumb pop bright','Double thumb','Hammer-on slap','Pull-off slap','Ghost note slap','Open string slap','Muted slap percussive','Fast slap lick','Slow slap groove'] },
+      synth_bass: { label: 'Synth Bass', descs: ['Analog sub','Digital cold','FM metallic','Wavetable morphing','Pulse width sweep','Sawtooth aggressive','Square hollow','Triangle soft','Noise texture','Resonant filter','Self-oscillating','Acid 303','Sub-bass rumble','808 sub','909 punch','Deep house warm','Techno driving','Trance arpeggiated','Dubstep wobble','Drum and bass reese'] }
+    }
+  },
+  stage_brass: {
+    label: 'Stage Brass', icon: 'wind',
+    subs: {
+      trumpet: { label: 'Trumpet', descs: ['Bright and brilliant','Warm and mellow','Muted cup','Muted harmon','Muted straight','Muted plunger','Solo classical','Solo jazz','Solo pop','Section unison','Section harmony','Fanfare royal','Bugle military','Baroque natural','Piccolo high','Bass trumpet deep','Flugelhorn warm','Cornet vintage','Pocket trumpet bright','Slide trumpet jazz'] },
+      trombone: { label: 'Trombone', descs: ['Tenor trombone bright','Tenor trombone warm','Bass trombone deep','Alto trombone light','Soprano trombone high','Contrabass subsonic','Valve trombone smooth','Slide glissando','Section unison','Section harmony','Jazz solo','Classical solo','Marching band','Brass band','Orchestral section','Big band section','Ska upbeat','Dixieland trad','Cool jazz smooth','Free jazz avant-garde'] },
+      tuba: { label: 'Tuba', descs: ['Orchestral deep','Marching band','Brass band oompah','Dixieland bass','Jazz walking','Solo classical','Solo contemporary','Contrabass sub','Euphonium British','Sousaphon marching','Helicon riding','Ophicleide historical','Serpent historical','Cimbasso Italian','Wagner tuba','Tenor horn','Baritone horn','Flugelhorn bass','Bass trumpet','Contrabass trombone'] },
+      french_horn: { label: 'French Horn', descs: ['Orchestral solo','Orchestral section','Hunting call','Heroic fanfare','Mellow warm','Bright and piercing','Muted stopped','Muted wa-wa','Hand horn natural','Vienna horn','Double horn','Triple horn','Natural horn','Baroque horn','Classical horn','Romantic horn','Modern horn','Jazz horn','Chamber music','Film score epic'] },
+      muted_brass: { label: 'Muted Brass', descs: ['Cup mute warm','Harmon mute buzz','Straight mute bright','Plunger mute wah','Bucket mute dark','Solo mute thin','Practice mute quiet','Pixie mute','Velvet mute soft','Felt mute dead','Stoneline mute','Shastock mute','Humes & Berg mute','Tom Crown mute','Jo-Ral mute','Denis Wick mute','Bach mute','Practice mute','Harmon wah-wah','Plunger expressive'] },
+      synth_brass: { label: 'Synth Brass', descs: ['Analog brassy','Digital bright','Warm pad brass','Sharp stab brass','Slow attack pad','Fast attack stab','Detuned unison','PWM pulse brass','Super saw brass','Vintage synth brass','Juno brass','Prophet brass','Oberheim brass','CS-80 cinematic','FM bell brass','Wavetable morphing','Resonant filter sweep','Self-oscillating','Sub-bass brass','High shimmer brass'] }
+    }
+  },
+  stage_woodwinds: {
+    label: 'Stage Woodwinds', icon: 'wind',
+    subs: {
+      piccolo: { label: 'Piccolo', descs: ['Orchestral high','Marching band','Solo classical','Solo contemporary','Bird-like tweet','Whistle-like bright','Piercing and sharp','Sweet and delicate','Military signal','Fife traditional','Irish wooden','Baroque wooden','Classical silver','Modern silver','Plastic student','Wood professional','Concerto virtuosic','Chamber music','Film score bird','Sound effect high'] },
+      recorder: { label: 'Recorder', descs: ['Soprano bright','Alto warm','Tenor mellow','Bass deep','Garklein tiny','Sopranino high','Great bass low','Contrabass sub','Baroque fingering','German fingering','Renaissance wide bore','Baroque narrow bore','Plastic student','Wood professional','Irish wooden','English consort','Continuo bass','Solo baroque','Chamber music','Medieval folk'] },
+      pan_flute: { label: 'Pan Flute', descs: ['Andean traditional','Romanian nai','Chinese paixiao','South American','Bamboo natural','Wood warm','Plastic bright','Metal cold','Solo melodic','Ensemble harmony','Breathy and soft','Clear and articulate','Vibrato wide','No vibrato straight','Overblown harmonics','Tongued staccato','Legato flowing','Trill ornament','Glissando sliding','Pentatonic scale'] },
+      blown_bottle: { label: 'Blown Bottle', descs: ['Wine bottle','Beer bottle','Glass bottle','Plastic bottle','Ceramic jug','Clay pot','Bamboo tube','Metal pipe','Wooden tube','Conch shell','Ocarina-like','Whistle-like','Flute-like','Breathy and soft','Clear and piercing','Vibrato natural','No vibrato straight','Overblown high','Fundamental low','Harmonic series'] },
+      whistle: { label: 'Whistle', descs: ['Tin whistle Irish','Low whistle Irish','Penny whistle','Soprano whistle','Alto whistle','Tenor whistle','Bass whistle','Plastic bright','Brass warm','Nickel silver','Wooden folk','Metal traditional','Vibrato Irish style','No vibrato straight','Tongued crisp','Legato smooth','Roll ornament','Cut ornament','Crann ornament','Slide ornament'] },
+      ocarina: { label: 'Ocarina', descs: ['Soprano high','Alto mid','Tenor low','Bass deep','Transverse sweet','Pendant small','Inline ergonomic','Double chamber','Triple chamber','Quad chamber','Clay traditional','Ceramic smooth','Plastic bright','Wood warm','Metal cold','Zelda fantasy','Andean traditional','Italian sweet potato','Chinese xun-like','Japanese style'] }
+    }
+  },
+  stage_ethnic: {
+    label: 'Stage Ethnic', icon: 'globe',
+    subs: {
+      sitar: { label: 'Sitar', descs: ['Classical Hindustani','Raga alap','Raga jor','Raga jhala','Gat composition','Meend glissando','Gamak ornament','Andolan oscillation','Krintan rapid','Zamzama complex','Vilambit slow','Madhyal medium','Drut fast','Teentaal rhythm','Ektaal rhythm','Jhaptaal rhythm','Rupak rhythm','Dadra rhythm','Keherwa rhythm','Tintal rhythm'] },
+      banjo: { label: 'Banjo', descs: ['Clawhammer old-time','Bluegrass Scruggs','Frailing folk','Two-finger picking','Three-finger picking','Four-string tenor','Five-string resonator','Six-string guitar','Plectrum four-string','Minstrel stroke','Classic fingerstyle','Irish tenor','Jazz Dixieland','Old-time modal','Bluegrass melodic','Progressive modern','Open G tuning','Open D tuning','Double C tuning','Sawmill tuning'] },
+      shamisen: { label: 'Shamisen', descs: ['Tsugaru fast','Nagauta classical','Jiuta traditional','Minyo folk','Gidayu narrative','Kouta popular','Hauta elegant','Tokiwazu dramatic','Kiyomoto lyrical','Shinnai melancholic','Futozao thick neck','Hosozao thin neck','Chuzao medium neck','Bachi plectrum','Finger plucked','Slap percussive','Tremolo fast','Sustain long','Staccato short','Glissando slide'] },
+      koto: { label: 'Koto', descs: ['Ikuta school','Yamada school','Sokyoku classical','Jiuta ensemble','Kumiuta vocal','Danmono instrumental','Hogaku traditional','Sokyoku modern','Tegoto interlude','Hiki dashi opening','Oshi kake closing','Atozuke coda','Hiki yose introduction','Sawari buzz','Oshi press','Hiki pull','Kaki scrape','Uchi strike','Yururi vibrato','Hiki glissando'] },
+      kalimba: { label: 'Kalimba', descs: ['African mbira','Shona traditional','Zimbabwean','South African','West African','Celeste tuned','Electric amplified','Acoustic natural','Pentatonic scale','Diatonic scale','Chromatic scale','Bass kalimba','Treble kalimba','Alto kalimba','Soprano kalimba','Gourd resonator','Box resonator','Plate resonator','Bottle resonator','Electronic kalimba'] },
+      bagpipe: { label: 'Bagpipe', descs: ['Great Highland Scottish','Border pipes Scottish','Northumbrian smallpipes','Uilleann pipes Irish','Welsh pibgorn','Breton bombarde','Galician gaita','Asturian gaita','Swedish sackpipa','Estonian torupill','Latvian dudas','Lithuanian lumzdelis','Bulgarian gaida','Macedonian gaida','Serbian gaida','Turkish tulum','Tunisian mezoued','Egyptian arghul','Persian ney-anban','Indian shehnai-like'] },
+      fiddle: { label: 'Fiddle', descs: ['Irish traditional','Scottish traditional','Cape Breton','Appalachian old-time','Bluegrass','Cajun','Metis','Scandinavian','Shetland','Orcadian','Galician','English Morris','Canadian French','Texas contest','Ozark mountain','New England contra','Southern old-time','Western swing','Country fiddle','Blues fiddle'] },
+      shanai: { label: 'Shanai', descs: ['Classical Hindustani','Shehnai wedding','Mangal vadya auspicious','Bansuri-like breathy','Oboe-like reedy','Clarinet-like smooth','Saxophone-like bright','Trumpet-like piercing','Flute-like airy','Recorder-like sweet','Duduk-like mournful','Zurna-like loud','Sorna-like festive','Suona-like Chinese','Hichiriki-like Japanese','Piri-like Korean','Dizi-like Chinese','Ney-like Persian','Kaval-like Balkan','Duduk-like Armenian'] }
+    }
+  },
+  stage_percussion: {
+    label: 'Stage Percussion', icon: 'drum',
+    subs: {
+      melodic_perc: { label: 'Melodic Percussion', descs: ['Tinkle bell','Agogo high','Agogo low','Steel drums tenor','Steel drums double','Steel pans Trinidad','Vibraphone motor on','Vibraphone motor off','Marimba warm','Marimba bright','Xylophone bright','Glockenspiel bell','Celesta magical','Tubular bells orchestral','Chimes church','Music box','Kalimba thumb piano','Handpan hang drum','Handpan rav','Handpan ayasa'] },
+      drum_fx: { label: 'Drum FX', descs: ['Taiko thunder','Melodic tom high','Melodic tom low','Synth drum electronic','Reverse cymbal','Anvil strike','Whip crack','Ratchet gear','Siren hand','Thunder sheet','Lion roar','Bird whistle','Cuckoo clock','Castanets Spanish','Sandpaper block','Woodblock high','Woodblock low','Temple block','Claves','Triangle roll'] },
+      world_perc: { label: 'World Percussion', descs: ['Djembe slap','Djembe tone','Djembe bass','Talking drum','Udu clay pot','Shekere gourd','Axatse Ewe','Kagan Ewe','Kidi Ewe','Sogo Ewe','Bata Cuban','Conga open','Conga slap','Conga bass','Bongo open','Bongo slap','Timbales','Pandeiro Brazilian','Surdo bass','Repinique lead'] },
+      orchestral_perc: { label: 'Orchestral Perc', descs: ['Timpani roll','Timpani hit','Timpani glissando','Bass drum orchestral','Snare drum roll','Snare drum rimshot','Tenor drum roll','Triangle roll','Triangle hit','Woodblock temple','Temple block five','Ratchet gear','Siren hand','Whistle slide','Thunder sheet','Castanets','Whip crack','Anvil strike','Tambourine roll','Tambourine hit'] },
+      electronic_perc: { label: 'Electronic Perc', descs: ['808 kick sub','808 snare tight','808 clap','808 cowbell','808 conga','808 tom','808 hi-hat closed','808 hi-hat open','909 kick punch','909 snare crunchy','909 clap','909 rimshot','909 hi-hat','707 kick dry','707 snare','707 tom','606 kick thin','606 snare','Linn kick tight','Linn snare crisp'] },
+      cymbal_gong: { label: 'Cymbals & Gongs', descs: ['Crash explosive','Ride shimmering','China trashy','Splash quick','Gong massive','Bell tree','Finger cymbals','Crotale tuned','Hi-hat chick','Hi-hat open sizzle','Hi-hat foot splash','Crash-ride hybrid','Swish knocker','Pang exotic','Stack trashy','Ice bell','Orchestral crash','Orchestral suspended','Tam-tam dark','Wind gong'] }
+    }
+  }
+};
+
+const MOODS = [
+  'Melancholic','Euphoric','Dark & brooding','Dreamy & ethereal','Tense & anxious',
+  'Nostalgic','Romantic','Mysterious','Playful & quirky','Aggressive & intense',
+  'Calm & serene','Chaotic & frantic','Hopeful & uplifting','Lonely & isolated',
+  'Rebellious & defiant','Spiritual & transcendent','Sensual & seductive',
+  'Whimsical & fantastical','Grandiose & epic','Intimate & personal',
+  'Bittersweet','Energetic & pumped','Laid-back & chill','Dramatic & theatrical',
+  'Creepy & unsettling','Joyful & celebratory','Reflective & contemplative',
+  'Empowering & triumphant','Vulnerable & fragile','Sarcastic & ironic',
+  'Warm & cosy','Cold & distant','Gritty & raw','Polished & sleek',
+  'Organic & earthy','Synthetic & futuristic','Vintage & retro','Lo-fi & dusty',
+  'Cinematic & sweeping','Minimal & sparse','Complex & layered'
+];
+
+const STYLES = [
+  'Ambient','Lo-fi hip-hop','Trap','Drum & bass','House','Techno','Synthwave',
+  'Cinematic orchestral','Indie rock','Post-rock','Shoegaze','Jazz fusion',
+  'Funk','Soul','R&B','Pop','EDM','Dubstep','Future bass','Hyperpop',
+  'Art pop','Art rock','Progressive rock','Math rock','Emo','Screamo',
+  'Hardcore punk','Post-punk','New wave','Gothic rock','Industrial','EBM',
+  'Darkwave','Coldwave','Vaporwave','Witch house','Dungeon synth',
+  'Berlin school','Krautrock','Psychedelic rock','Stoner rock','Doom metal',
+  'Black metal','Death metal','Power metal','Symphonic metal','Folk metal',
+  'Bluegrass','Appalachian folk','Celtic folk','Nordic folk','Balkan brass',
+  'Afrobeat','Highlife','Soukous','Mbalax','Kizomba','Semba','Funana',
+  'Bossa nova','Samba','MPB','Tropicália','Forró','Choro','Frevo',
+  'Cumbia','Vallenato','Bambuco','Joropo','Bullerengue','Currulao',
+  'Raï','Chaabi','Gnawa','Mizrahi','Ashiq','Mugham','Maqam',
+  'Ghazal','Qawwali','Bhajan','Carnatic classical','Hindustani classical',
+  'Gamelan','Keroncong','Dangdut','Luk thung','Mor lam','Piphat',
+  'Enka','Kayokyoku','City pop','Shibuya-kei','Visual kei','J-pop',
+  'K-pop','Trot','Pansori','Samulnori','Nongak','Arirang',
+  'Tuvan throat singing','Inuit throat singing','Yoik','Kalevala runo',
+  'Reggae','Dub','Dancehall','Soca','Calypso','Zouk','Kompa',
+  'Salsa','Merengue','Bachata','Dembow','Reggaeton','Latin trap',
+  'Chicano rap','Hyphy','Bounce','Crunk','Trap soul','Alternative R&B',
+  'Neo-soul','Quiet storm','Smooth jazz','Cool jazz','Bebop','Hard bop',
+  'Free jazz','Avant-garde jazz','Third stream','Fusion','Jazz-funk',
+  'Acid jazz','Nu jazz','Electro swing','Gypsy jazz','Latin jazz',
+  'Afro-Cuban jazz','Brazilian jazz','West Coast jazz','Modal jazz',
+  'Spiritual jazz','Steampunk','Solarpunk','Cyberpunk','Biopunk','Atompunk','Dieselpunk',
+  'Afrofuturism','Afrosurrealism','Hauntology','Hypnagogic pop',
+  'Wonky','Purple sound','Deconstructed club','Bubblegum bass',
+  'UK garage','Grime','Drill','Road rap','Afroswing','UK funky',
+  'Bassline','Speed garage','2-step','Breakstep','Post-dubstep',
+  'Neurofunk','Jump up','Liquid funk','Atmospheric dnb','Techstep',
+  'Hardstep','Darkstep','Ragga jungle','Oldschool jungle','Breakcore',
+  'Flashcore','Speedcore','Gabber','Hardstyle','Rawstyle','Frenchcore',
+  'Uptempo hardcore','Terrorcore','Splittercore','Extratone',
+  'Happy hardcore','UK hardcore','Freeform hardcore','J-core','Nightcore',
+  'Future core','Kawaii bass','Otacore','Anison','Denpa',
+  'Chiptune','Bitpop','NES-style','SNES-style','Sega-style','Game Boy style',
+  'C64-style','Amiga-style','Atari-style','FM synthesis','Pulse wave',
+  'Tracker music','Demoscene','Mod music','MIDI orchestral','General MIDI',
+  'SoundFont','Sample-based','ROMpler','Workstation','Arranger',
+  'Production music library','Stock music','Royalty-free','Trailer music',
+  'Epic music','Hybrid orchestral'
+];
+
+let state = {
+  family: null,
+  sub: null,
+  desc: null,
+  moods: [],
+  styles: [],
+  lockInst: false,
+  lockMood: false,
+  lockStyle: false,
+  enhanceHistory: [],
+  promptBeforeEnhance: '',
+  userEdited: false,
+  lastAutoPrompt: ''
+};
+
+const ICONS = {
+  mic: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>',
+  guitar: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m11.5 14.5-1 1"/><path d="M3 21l3.5-3.5"/><path d="m16 7 2-2-1-1-2 2"/><path d="m11 12 2-2-1-1-2 2"/><circle cx="18.5" cy="5.5" r="2.5"/><circle cx="7.5" cy="16.5" r="2.5"/></svg>',
+  piano: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.5 8c-1.4 0-2.6-.8-3.2-2A6.87 6.87 0 0 0 2 9v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-8.5C22 9.1 20.4 8 18.5 8"/><path d="M2 14h20"/><path d="M6 14v4"/><path d="M10 14v4"/><path d="M14 14v4"/><path d="M18 14v4"/></svg>',
+  music: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>',
+  wind: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2"/><path d="M9.6 4.6A2 2 0 1 1 11 8H2"/><path d="M12.6 19.4A2 2 0 1 0 14 16H2"/></svg>',
+  drum: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><path d="M12 2v4"/><path d="M12 18v4"/><path d="m4.93 4.93 2.83 2.83"/><path d="m16.24 16.24 2.83 2.83"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="m4.93 19.07 2.83-2.83"/><path d="m16.24 7.76 2.83-2.83"/></svg>',
+  globe: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>',
+  cpu: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M15 2v2"/><path d="M15 20v2"/><path d="M2 15h2"/><path d="M2 9h2"/><path d="M20 15h2"/><path d="M20 9h2"/><path d="M9 2v2"/><path d="M9 20v2"/></svg>',
+  cloud: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19c0-3.037-2.463-5.5-5.5-5.5S6.5 15.963 6.5 19"/><path d="M19 19a4 4 0 1 0-1.5-7.7A7 7 0 1 0 5 19"/></svg>',
+  users: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+  zap: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
+  activity: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"/></svg>'
+};
+
+function renderFamilies() {
+  const row = document.getElementById('famRow');
+  row.innerHTML = '';
+  for (const [key, fam] of Object.entries(DATA)) {
+    const btn = document.createElement('button');
+    btn.className = 'fam-btn' + (state.family === key ? ' active' : '');
+    btn.innerHTML = (ICONS[fam.icon] || '') + fam.label;
+    btn.onclick = () => selectFamily(key);
+    row.appendChild(btn);
+  }
+}
+
+function renderSubs() {
+  const row = document.getElementById('subRow');
+  row.innerHTML = '';
+  if (!state.family) return;
+  const fam = DATA[state.family];
+  for (const [key, sub] of Object.entries(fam.subs)) {
+    const btn = document.createElement('button');
+    btn.className = 'sub-btn' + (state.sub === key ? ' active' : '');
+    btn.textContent = sub.label;
+    btn.onclick = () => selectSub(key);
+    row.appendChild(btn);
+  }
+}
+
+function renderDescs() {
+  const row = document.getElementById('descRow');
+  row.innerHTML = '';
+  if (!state.family || !state.sub) return;
+  const descs = DATA[state.family].subs[state.sub].descs;
+  for (const desc of descs) {
+    const chip = document.createElement('button');
+    chip.className = 'desc-chip' + (state.desc === desc ? ' active' : '');
+    chip.textContent = desc;
+    chip.onclick = () => selectDesc(desc);
+    row.appendChild(chip);
+  }
+}
+
+function renderMoods() {
+  const container = document.getElementById('moodChips');
+  container.innerHTML = '';
+  for (const mood of MOODS) {
+    const chip = document.createElement('button');
+    chip.className = 'support-chip' + (state.moods.includes(mood) ? ' active mood' : '');
+    chip.textContent = mood;
+    chip.onclick = () => toggleMood(mood);
+    container.appendChild(chip);
+  }
+}
+
+function renderStyles() {
+  const container = document.getElementById('styleChips');
+  container.innerHTML = '';
+  for (const style of STYLES) {
+    const chip = document.createElement('button');
+    chip.className = 'support-chip' + (state.styles.includes(style) ? ' active style' : '');
+    chip.textContent = style;
+    chip.onclick = () => toggleStyle(style);
+    container.appendChild(chip);
+  }
+}
+
+function selectFamily(key) {
+  if (state.lockInst) return;
+  state.family = key;
+  state.sub = null;
+  state.desc = null;
+  state.userEdited = false;
+  renderFamilies();
+  renderSubs();
+  renderDescs();
+  updateCurrentInst();
+  updatePrompt();
+}
+
+function selectSub(key) {
+  if (state.lockInst) return;
+  state.sub = key;
+  state.desc = null;
+  state.userEdited = false;
+  renderSubs();
+  renderDescs();
+  updateCurrentInst();
+  updatePrompt();
+}
+
+function selectDesc(desc) {
+  if (state.lockInst) return;
+  state.desc = desc;
+  state.userEdited = false;
+  renderDescs();
+  updateCurrentInst();
+  updatePrompt();
+}
+
+function toggleMood(mood) {
+  if (state.lockMood) return;
+  if (state.moods.includes(mood)) {
+    state.moods = state.moods.filter(m => m !== mood);
+  } else {
+    state.moods.push(mood);
+  }
+  state.userEdited = false;
+  renderMoods();
+  updatePrompt();
+}
+
+function toggleStyle(style) {
+  if (state.lockStyle) return;
+  if (state.styles.includes(style)) {
+    state.styles = state.styles.filter(s => s !== style);
+  } else {
+    state.styles.push(style);
+  }
+  state.userEdited = false;
+  renderStyles();
+  updatePrompt();
+}
+
+function updateCurrentInst() {
+  const el = document.getElementById('currentInst');
+  if (!state.family || !state.sub || !state.desc) {
+    el.textContent = '—';
+    return;
+  }
+  const fam = DATA[state.family];
+  const sub = fam.subs[state.sub];
+  el.textContent = sub.label + ' — ' + state.desc;
+}
+
+function updatePrompt() {
+  const parts = [];
+  if (state.family && state.sub && state.desc) {
+    const fam = DATA[state.family];
+    const sub = fam.subs[state.sub];
+    parts.push(fam.label + ' — ' + sub.label + ': ' + state.desc);
+  }
+  if (state.moods.length) {
+    parts.push('Mood: ' + state.moods.join(', '));
+  }
+  if (state.styles.length) {
+    parts.push('Style: ' + state.styles.join(', '));
+  }
+  const textarea = document.getElementById('promptText');
+  const newPrompt = parts.join('. ');
+  // Always update when selectors change (userEdited only blocks if user manually typed)
+  if (!state.userEdited) {
+    textarea.value = newPrompt;
+    state.lastAutoPrompt = newPrompt;
+  }
+  updateCharCount();
+}
+
+function updateCharCount() {
+  const text = document.getElementById('promptText').value;
+  document.getElementById('charCount').textContent = text.length + ' / 1000';
+}
+
+function randDesc() {
+  if (state.lockInst || !state.family || !state.sub) return;
+  const descs = DATA[state.family].subs[state.sub].descs;
+  state.desc = descs[Math.floor(Math.random() * descs.length)];
+  state.userEdited = false;
+  renderDescs();
+  updateCurrentInst();
+  updatePrompt();
+}
+
+function randMood() {
+  if (state.lockMood) return;
+  const count = 1 + Math.floor(Math.random() * 3);
+  state.moods = [];
+  const pool = [...MOODS];
+  for (let i = 0; i < count && pool.length; i++) {
+    const idx = Math.floor(Math.random() * pool.length);
+    state.moods.push(pool.splice(idx, 1)[0]);
+  }
+  state.userEdited = false;
+  renderMoods();
+  updatePrompt();
+}
+
+function randStyle() {
+  if (state.lockStyle) return;
+  const count = 1 + Math.floor(Math.random() * 2);
+  state.styles = [];
+  const pool = [...STYLES];
+  for (let i = 0; i < count && pool.length; i++) {
+    const idx = Math.floor(Math.random() * pool.length);
+    state.styles.push(pool.splice(idx, 1)[0]);
+  }
+  state.userEdited = false;
+  renderStyles();
+  updatePrompt();
+}
+
+function sparkAll() {
+  if (!state.lockInst) {
+    const famKeys = Object.keys(DATA);
+    state.family = famKeys[Math.floor(Math.random() * famKeys.length)];
+    const subKeys = Object.keys(DATA[state.family].subs);
+    state.sub = subKeys[Math.floor(Math.random() * subKeys.length)];
+    const descs = DATA[state.family].subs[state.sub].descs;
+    state.desc = descs[Math.floor(Math.random() * descs.length)];
+    renderFamilies();
+    renderSubs();
+    renderDescs();
+    updateCurrentInst();
+  }
+  if (!state.lockMood) randMood();
+  if (!state.lockStyle) randStyle();
+  state.userEdited = false;
+  updatePrompt();
+}
+
+function toggleLockInst() {
+  state.lockInst = !state.lockInst;
+  document.getElementById('lockInst').classList.toggle('locked', state.lockInst);
+}
+
+function toggleLockMood() {
+  state.lockMood = !state.lockMood;
+  document.getElementById('lockMood').classList.toggle('locked', state.lockMood);
+  document.getElementById('moodSection').classList.toggle('locked', state.lockMood);
+}
+
+function toggleLockStyle() {
+  state.lockStyle = !state.lockStyle;
+  document.getElementById('lockStyle').classList.toggle('locked', state.lockStyle);
+  document.getElementById('styleSection').classList.toggle('locked', state.lockStyle);
+}
+
+function copyPrompt() {
+  const text = document.getElementById('promptText').value;
+  navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard'));
+}
+
+function copyInstOnly() {
+  if (!state.family || !state.sub || !state.desc) {
+    showToast('No instrument selected');
+    return;
+  }
+  const fam = DATA[state.family];
+  const text = fam.label + ' — ' + fam.subs[state.sub].label + ': ' + state.desc;
+  navigator.clipboard.writeText(text).then(() => showToast('Copied instrument only'));
+}
+
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2000);
+}
+
+const ENHANCE_TEMPLATES = [
+  "Layered with rich harmonic overtones and subtle room ambience. The performance captures an intimate, expressive quality with natural dynamics and breathing space between phrases.",
+  "Recorded with premium microphones in a treated studio environment. The tone is full-bodied with controlled low-end, clear mids, and airy highs that cut through any mix.",
+  "Processed with subtle saturation and analog warmth. The sound has a three-dimensional quality with depth, width, and height that creates an immersive listening experience.",
+  "Featuring nuanced articulations and organic variations. Each note has its own character with slight pitch drift, velocity changes, and timbral shifts that feel human and alive.",
+  "Blending traditional techniques with modern production. The result is timeless yet contemporary, suitable for film scoring, game audio, or cutting-edge music production.",
+  "Rich in textural detail with evolving harmonics. The sound breathes and moves, creating an emotional landscape that draws the listener into the performance.",
+  "Crafted with meticulous attention to sonic detail. Every frequency range is carefully balanced, from sub-bass rumble to sparkling treble, ensuring clarity on any playback system.",
+  "Infused with the warmth of vintage gear and the precision of digital processing. The character is unmistakably authentic while maintaining modern polish and punch.",
+  "Designed to sit perfectly in a dense mix. The midrange is present and articulate, the transients are crisp without being harsh, and the sustain is smooth and musical.",
+  "Evoking a specific time and place through sonic storytelling. The performance transports the listener with its evocative tone, expressive dynamics, and atmospheric depth."
+];
+
+function enhancePrompt() {
+  const textarea = document.getElementById('promptText');
+  const current = textarea.value.trim();
+  if (!current) {
+    showToast('Generate a prompt first');
+    return;
+  }
+  if (current.length > 950) {
+    showToast('Prompt too long to enhance');
+    return;
+  }
+  state.promptBeforeEnhance = current;
+  state.enhanceHistory.push(current);
+
+  const template = ENHANCE_TEMPLATES[Math.floor(Math.random() * ENHANCE_TEMPLATES.length)];
+  const enhanced = current + '. ' + template;
+  textarea.value = enhanced;
+  state.lastAutoPrompt = enhanced;
+  state.userEdited = false;
+  updateCharCount();
+
+  const msg = document.getElementById('enhanceMsg');
+  msg.textContent = 'Enhanced! Added ~' + template.length + ' characters';
+  msg.style.opacity = '1';
+  setTimeout(() => { msg.style.opacity = '0'; }, 3000);
+
+  document.getElementById('undoEnhanceBtn').disabled = false;
+}
+
+function undoEnhance() {
+  if (state.enhanceHistory.length === 0) return;
+  const previous = state.enhanceHistory.pop();
+  const textarea = document.getElementById('promptText');
+  textarea.value = previous;
+  state.lastAutoPrompt = previous;
+  state.userEdited = false;
+  updateCharCount();
+  if (state.enhanceHistory.length === 0) {
+    document.getElementById('undoEnhanceBtn').disabled = true;
+  }
+}
+
+// Event listeners
+document.getElementById('randDescBtn').onclick = randDesc;
+document.getElementById('lockInst').onclick = toggleLockInst;
+document.getElementById('sparkAll').onclick = () => { if (checkAccess()) sparkAll(); };
+document.getElementById('randMood').onclick = randMood;
+document.getElementById('lockMood').onclick = toggleLockMood;
+document.getElementById('randStyle').onclick = randStyle;
+document.getElementById('lockStyle').onclick = toggleLockStyle;
+document.getElementById('copyBtn').onclick = () => { if (checkAccess()) copyPrompt(); };
+document.getElementById('enhanceBtn').onclick = () => { if (checkAccess()) enhancePrompt(); };
+document.getElementById('undoEnhanceBtn').onclick = undoEnhance;
+document.getElementById('copyInstOnlyBtn').onclick = () => { if (checkAccess()) copyInstOnly(); };
+document.getElementById('promptText').addEventListener('input', () => {
+  state.userEdited = true;
+  updateCharCount();
+});
+
+// Pricing button
+document.getElementById('pricingBtn').onclick = () => showGate('Choose a pass to unlock full access.');
+
+// Tester code input
+document.getElementById('gateTesterInput').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') applyTesterCode(e.target);
+});
+
+// Initialize
+renderFamilies();
+renderSubs();
+renderDescs();
+renderMoods();
+renderStyles();
+updateCharCount();
+updatePassBar();
+handlePaymentReturn();
+
+// Show gate if locked
+const initAccess = getAccess();
+if (initAccess.type === 'locked') {
+  showGate('You have used all your free tries. Unlock full access to keep creating.');
+}
+
+// Auto-select first family, sub, desc to show something
+const firstFam = Object.keys(DATA)[0];
+selectFamily(firstFam);
+const firstSub = Object.keys(DATA[firstFam].subs)[0];
+selectSub(firstSub);
+const firstDesc = DATA[firstFam].subs[firstSub].descs[0];
+selectDesc(firstDesc);
+
+</script>
+</body>
+</html>

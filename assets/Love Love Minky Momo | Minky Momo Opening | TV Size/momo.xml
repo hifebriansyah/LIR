@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<timedtext format="3">
+  <head>
+    <!-- 
+      fc: Font Color (Pink #FF66C0)
+      et: Edge Type 1 (Uniform Outline/Stroke)
+      ec: Edge Color (Black #000000)
+      bo: Background Opacity 0 (Transparent)
+      sz: Font Size % (125 = 125% scale, slightly bigger than default)
+    -->
+    <pen id="1" fc="#FF66C0" et="3" ec="#000000" bo="0" sz="300" />
+    
+    <!-- 
+      ap: Anchor Point (4 = Center middle)
+      ah: Horizontal Alignment % (50 = Center horizontally)
+      av: Vertical Alignment % (50 = Center vertically)
+    -->
+    <wp id="1" ap="4" ah="50" av="50" />
+  </head>
+  <body>
+    <p t="12700" d="2760" wp="1"><s p="1">Love Love Minky Momo</s></p>
+    <p t="15460" d="2860" wp="1"><s p="1">Coba lah kau dengarkan</s></p>
+    <p t="19060" d="2620" wp="1"><s p="1">Love Love Minky Momo</s></p>
+    <p t="21680" d="2840" wp="1"><s p="1">Yang ada di hatiku</s></p>
+    <p t="26480" d="2400" wp="1"><s p="1">Ratu penyihir</s></p>
+    <p t="28880" d="1320" wp="1"><s p="1">Penyihir</s></p>
+    <p t="30200" d="2020" wp="1"><s p="1">Dengan rasa berdebar</s></p>
+    <p t="32220" d="2500" wp="1"><s p="1">Ada yang menunggu</s></p>
+    <p t="34720" d="1500" wp="1"><s p="1">Menunggu</s></p>
+    <p t="36220" d="2080" wp="1"><s p="1">Di seberang jalan itu</s></p>
+    <p t="38300" d="2300" wp="1"><s p="1">Berputarlah waktu</s></p>
+    <p t="40600" d="1720" wp="1"><s p="1">Berputar</s></p>
+    <p t="42320" d="2220" wp="1"><s p="1">Kisah cerita mimpi</s></p>
+    <p t="44540" d="2420" wp="1"><s p="1">Bertemu denganku</s></p>
+    <p t="46960" d="1380" wp="1"><s p="1">Bertemu</s></p>
+    <p t="48340" d="2300" wp="1"><s p="1">Aku yang bagaimana</s></p>
+    <p t="50640" d="3080" wp="1"><s p="1">Ingin menjadi apa</s></p>
+    <p t="53720" d="3560" wp="1"><s p="1">Saat dewasa</s></p>
+    <p t="57960" d="900" wp="1"><s p="1">Ingin menjadi</s></p>
+    <p t="58860" d="1020" wp="1"><s p="1">Menjadi apa</s></p>
+    <p t="59880" d="2420" wp="1"><s p="1">Tak terbayangkan</s></p>
+    <p t="63960" d="1400" wp="1"><s p="1">Dreaming</s></p>
+    <p t="66060" d="1580" wp="1"><s p="1">Semoga mimpiku</s></p>
+    <p t="67640" d="1780" wp="1"><s p="1">Jadi nyata</s></p>
+    <p t="70260" d="2120" wp="1"><s p="1">Love Love Minky Momo</s></p>
+    <p t="72380" d="2840" wp="1"><s p="1">Coba lah kau dengarkan</s></p>
+    <p t="76420" d="2180" wp="1"><s p="1">Love Love Minky Momo</s></p>
+    <p t="78600" d="2740" wp="1"><s p="1">Yang ada di hatiku</s></p>
+    <p t="88860" d="2400" wp="1"><s p="1">Coba lah kau dengarkan</s></p>
+    <p t="91260" d="500" wp="1"><s p="1">Coba lah kau dengarkan</s></p>
+  </body>
+</timedtext>

@@ -1,0 +1,18 @@
+python3 -m whisper souledge.wav  \    
+  --model large-v3 \
+  --language Indonesian \
+  --output_format srt \
+  --word_timestamps True \
+  --fp16 False \
+  --condition_on_previous_text False \
+  --temperature 0 \
+  --beam_size 5 \
+  --no_speech_threshold 0.8 \
+  --logprob_threshold -0.5 \
+  --compression_ratio_threshold 1.8 \
+--initial_prompt "clear indonesia language" \
+--patience 2 \
+--max_words_per_line 1 \
+--threads 16
+
+
