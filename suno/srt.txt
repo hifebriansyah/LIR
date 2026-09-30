@@ -1,18 +1,41 @@
-python3 -m whisper souledge.wav  \    
-  --model large-v3 \
-  --language Indonesian \
-  --output_format srt \
-  --word_timestamps True \
-  --fp16 False \
-  --condition_on_previous_text False \
-  --temperature 0 \
-  --beam_size 5 \
-  --no_speech_threshold 0.8 \
-  --logprob_threshold -0.5 \
-  --compression_ratio_threshold 1.8 \
+python3 -m whisper souledge.wav \
+--model large-v3 \
+--language Indonesian \
+--output_format srt \
+--word_timestamps True \
+--fp16 False \
+--condition_on_previous_text False \
+--temperature 0 \
+--beam_size 5 \
+--no_speech_threshold 0.8 \
+--logprob_threshold -0.5 \
+--compression_ratio_threshold 1.8 \
 --initial_prompt "clear indonesia language" \
 --patience 2 \
 --max_words_per_line 1 \
 --threads 16
 
+skin
+-------
+make her skin brighter and smoother
 
+bust
+-------
+Modify only the adult character’s body proportions: give her a noticeably fuller bust while maintaining natural anatomy, balanced proportions, and the original anime character design. Preserve her face, hair, clothing, pose, lighting, background, and composition exactly. Keep the change tasteful and non-explicit, with the outfit remaining fully intact.
+
+taller
+--------
+Edit the existing anime character while preserving her identity, face, hairstyle, clothing, colors, pose, and original art style.
+
+Adjust only her body proportions to make her appear **taller and more model-like**:
+
+* Increase overall body height naturally
+* Give her longer, elegant legs with realistic anime proportions
+* Slightly lengthen the torso while keeping it anatomically balanced
+* Maintain natural shoulder and hip proportions
+* Create a graceful, slender fashion-model silhouette
+* Keep the head size proportional to the taller body
+* Preserve the original outfit exactly, adapting it naturally to the new proportions
+* Keep the same pose, camera angle, perspective, lighting, background, and composition
+
+Do not stretch the image itself. Modify the character's anatomy and proportions naturally so she looks like the same character with a taller, sophisticated model-like physique.
